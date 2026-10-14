@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-cn" data-shadcn-media="/luci-static/shadcn">
+	<head>
+		<meta charset="utf-8">
+		<meta name="theme-color" content="#7c3aed" media="(prefers-color-scheme: light)">
+		<meta name="theme-color" content="#22d3ee" media="(prefers-color-scheme: dark)">
+		<title>OpenWrt</title>
+		<script>
+			/* Day/night policy -- see luci-app-shadcn-config. mode: auto|light|dark,
+			   lock: true disables the per-browser preference entirely. */
+			window.SHADCN_THEME_CONFIG = { mode: 'dark', lock: true };
+			(function () {
+				var cfg = window.SHADCN_THEME_CONFIG;
+				var stored = null;
+				try { stored = localStorage.getItem('shadcn.theme'); } catch (e) {}
+				var theme = stored || 'device';
+				if (cfg.lock) {
+					/* Server policy wins: ignore the browser preference. */
+					theme = (cfg.mode === 'auto') ? 'device' : cfg.mode;
+					try { localStorage.setItem('shadcn.theme', theme); } catch (e) {}
+					document.documentElement.setAttribute('data-shadcn-mode-lock', 'true');
+				}
+				else if (!stored && cfg.mode !== 'auto') {
+					/* Seed the server default for first time visitors. */
+					theme = cfg.mode;
+					try { localStorage.setItem('shadcn.theme', theme); } catch (e) {}
+				}
+				var dark = theme === 'dark' || (theme === 'device' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+				document.documentElement.setAttribute('data-darkmode', dark ? 'true' : 'false');
+				var collapsed = localStorage.getItem('shadcn.sidebar') === 'true';
+				document.documentElement.setAttribute('data-sidebar-collapsed', collapsed ? 'true' : 'false');
+			})();
+		</script>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta name="color-scheme" content="light dark">
+		<link rel="stylesheet" href="/luci-static/shadcn/login.css">
+		<link rel="icon" href="/luci-static/shadcn/images/favicon.svg" type="image/svg+xml">
+		<link rel="icon" href="/luci-static/shadcn/images/favicon.ico" sizes="any">
+		<link rel="apple-touch-icon" href="/luci-static/shadcn/images/apple-touch-icon.png">
+		<link rel="manifest" href="/luci-static/shadcn/images/site.webmanifest">
+				<style id="shadcn-config">
+:root{--brand:#7c3aed;--primary:#7c3aed;--primary-foreground:#ffffff;--ring:#7c3aed;--focus-ring:color-mix(in srgb, #7c3aed 50%, transparent);--ring-a50:color-mix(in srgb, #7c3aed 50%, transparent);--primary-hover:color-mix(in oklab, #7c3aed 86%, #ffffff);--sidebar-active-bg:color-mix(in srgb, #7c3aed 12%, transparent);--sidebar-active-fg:color-mix(in oklab, #7c3aed 86%, #000000);--progress-bar-end:#7c3aed;--progress-bar-start:color-mix(in oklab, #7c3aed 60%, #ffffff);--login-path-stroke:#7c3aed;--primary-a5:color-mix(in srgb, #7c3aed 5%, transparent);--primary-a10:color-mix(in srgb, #7c3aed 10%, transparent);--primary-a15:color-mix(in srgb, #7c3aed 15%, transparent);--primary-a20:color-mix(in srgb, #7c3aed 20%, transparent);--primary-a25:color-mix(in srgb, #7c3aed 25%, transparent);--primary-a60:color-mix(in srgb, #7c3aed 60%, transparent);--primary-a70:color-mix(in srgb, #7c3aed 70%, transparent);--primary-a90:color-mix(in srgb, #7c3aed 90%, transparent);}
+[data-darkmode="true"]{--brand:#22d3ee;--primary:#22d3ee;--primary-foreground:#000000;--ring:#22d3ee;--focus-ring:color-mix(in srgb, #22d3ee 50%, transparent);--ring-a50:color-mix(in srgb, #22d3ee 50%, transparent);--primary-hover:color-mix(in oklab, #22d3ee 86%, #ffffff);--sidebar-active-bg:color-mix(in srgb, #22d3ee 14%, transparent);--sidebar-active-fg:color-mix(in oklab, #22d3ee 49%, #ffffff);--progress-bar-end:#22d3ee;--progress-bar-start:color-mix(in oklab, #22d3ee 60%, #161719);--login-path-stroke:#22d3ee;--primary-a5:color-mix(in srgb, #22d3ee 5%, transparent);--primary-a10:color-mix(in srgb, #22d3ee 10%, transparent);--primary-a15:color-mix(in srgb, #22d3ee 15%, transparent);--primary-a20:color-mix(in srgb, #22d3ee 20%, transparent);--primary-a25:color-mix(in srgb, #22d3ee 25%, transparent);--primary-a60:color-mix(in srgb, #22d3ee 60%, transparent);--primary-a70:color-mix(in srgb, #22d3ee 70%, transparent);--primary-a90:color-mix(in srgb, #22d3ee 90%, transparent);}
+[data-shadcn-mode-lock="true"] #theme-toggle-btn { display: none !important; }
+		</style>
+		<script src="/cgi-bin/luci/admin/translations"></script>
+		<script src="/luci-static/resources/cbi.js"></script>
+	</head>
+
+	<body class="lang_zh-cn" data-page="admin" data-asset-version="">
+<script src="/luci-static/resources/luci.js?v=-0"></script>
+<script>
+	L = new LuCI({ "media": "\/luci-static\/shadcn", "resource": "\/luci-static\/resources", "scriptname": "", "pathinfo": "", "documentroot": "", "requestpath": [ "admin" ], "dispatchpath": [ "admin" ], "pollinterval": 5, "ubuspath": "\/ubus\/", "sessionid": true, "token": "stub-token", "nodespec": null, "apply_rollback": 90, "apply_holdoff": 4, "apply_timeout": 5, "apply_display": 1.5, "rollback_token": null });
+</script>
+<style>:root{--login-bg-image:url('/luci-static/shadcn/wallpapers/desert-dunes.png')}</style>
+
+<main class="login-layout">
+
+	<!-- Form panel (left) -->
+	<section class="login-form-panel">
+
+		<span class="login-logo login-logo--topleft animate-element animate-delay-100">
+			<img src="/luci-static/shadcn/images/logo.svg" alt="" width="36" height="36">
+		</span>
+
+		<div class="login-form-wrap">
+			<div class="login-brand animate-element animate-delay-100">
+				<span class="login-hostname">OpenWrt</span>
+				<span class="login-subtitle">Please enter your username and password.</span>
+			</div>
+
+			<form method="post" class="login-form">
+
+				<div class="login-field animate-element animate-delay-200">
+					<label class="login-label" for="luci_username">Username</label>
+					<div class="login-input-glass">
+						<span class="login-input-icon">
+							<img src="/luci-static/shadcn/icons/user.svg" width="16" height="16" alt="">
+						</span>
+						<input
+							type="text"
+							name="luci_username"
+							id="luci_username"
+							placeholder="Username"
+							autocomplete="username"
+value="root"						>
+					</div>
+				</div>
+
+				<div class="login-field animate-element animate-delay-300">
+					<label class="login-label" for="luci_password">Password</label>
+					<div class="login-input-glass">
+						<span class="login-input-icon">
+							<img src="/luci-static/shadcn/icons/lock.svg" width="16" height="16" alt="">
+						</span>
+						<input
+							type="password"
+							name="luci_password"
+							id="luci_password"
+							placeholder="Password"
+							autocomplete="current-password"
+							autofocus
+						>
+						<button type="button" class="login-pw-toggle" id="pw-toggle" aria-label="Reveal/hide password">
+							<img src="/luci-static/shadcn/icons/eye.svg" id="pw-toggle-icon" width="16" height="16" alt="">
+						</button>
+					</div>
+				</div>
+
+				<input type="hidden" name="luci_magic" value="stub-token">
+
+				<button type="submit" class="login-submit animate-element animate-delay-400">
+					Log in
+				</button>
+			</form>
+		</div>
+
+		<footer class="login-footer">
+			<p>© <a href="https://github.com/eamonxg/luci-theme-shadcn/graphs/contributors?all=1" target="_blank" rel="noreferrer">luci-theme-shadcn</a> · Powered by <a href="https://openwrt.org" target="_blank" rel="noreferrer">OpenWrt</a> &amp; <a href="https://github.com/openwrt/luci" target="_blank" rel="noreferrer">LuCI</a> &amp; <a href="https://github.com/shadcn-ui/ui" target="_blank" rel="noreferrer">shadcn</a> &amp; <a href="https://github.com/lucide-icons/lucide" target="_blank" rel="noreferrer">Lucide</a></p>
+		</footer>
+	</section>
+
+	<!-- Image panel (right) -->
+	<section class="login-image-panel" aria-hidden="true">
+		<div class="login-image-inner animate-slide-right animate-delay-300"></div>
+
+	</section>
+
+</main>
+
+<script>
+(function () {
+	var btn = document.getElementById('pw-toggle');
+	var inp = document.getElementById('luci_password');
+	var ico = document.getElementById('pw-toggle-icon');
+	if (!btn || !inp || !ico) return;
+	var base = (document.documentElement.getAttribute('data-shadcn-media') || '/luci-static/shadcn').replace(/\/$/, '');
+	btn.addEventListener('click', function () {
+		var show = inp.type === 'password';
+		inp.type = show ? 'text' : 'password';
+		ico.src = base + (show ? '/icons/eye-off.svg' : '/icons/eye.svg');
+	});
+})();
+</script>
+
+
+
+  </body>
+</html>
+
+<!-- Lua compatibility mode active: no -->

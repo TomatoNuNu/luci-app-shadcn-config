@@ -1,0 +1,15 @@
+{
+	"admin/system/shadcn-config": {
+		"title": "Shadcn Theme",
+		"order": 91,
+		"css": "shadcn-config/style.css",
+		"action": {
+			"type": "view",
+			"path": "shadcn-config"
+		},
+		"depends": {
+			"acl": [ "luci-app-shadcn-config" ],
+			"uci": { "shadcn": true }
+		}
+	}
+}

@@ -1,0 +1,252 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Failed to store the file (filesystem full or read-only)."
+msgstr ""
+
+msgid "Invalid request."
+msgstr ""
+
+msgid "Unsupported file type. Please upload an SVG, PNG, ICO, WebP, GIF, JPG or AVIF image."
+msgstr ""
+
+msgid "Unsupported file type. Please upload a JPG, PNG, WebP, GIF or AVIF image."
+msgstr ""
+
+msgid "The uploaded file could not be found. Please try again."
+msgstr ""
+
+msgid "The file is too large (limit: %s)."
+msgstr ""
+
+msgid "The file contents do not match its extension, or the SVG contains active content (script, event handler, …) and was rejected."
+msgstr ""
+
+msgid "The file contents do not match its extension."
+msgstr ""
+
+msgid "Unknown error (%s)."
+msgstr ""
+
+msgid "Expecting a HEX colour value such as %s."
+msgstr ""
+
+msgid "Expecting <code>auto</code> or a HEX colour value such as %s."
+msgstr ""
+
+msgid "Expecting an <code>http://</code> or <code>https://</code> URL."
+msgstr ""
+
+msgid "The URL must not contain spaces, quotes, backslashes or angle brackets."
+msgstr ""
+
+msgid "Icon “%s” uploaded. Click “Save & Apply” to use it."
+msgstr ""
+
+msgid "Colour picker"
+msgstr ""
+
+msgid "Primary"
+msgstr ""
+
+msgid "Hover"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Shadcn theme"
+msgstr ""
+
+msgid "Settings for the <code>luci-theme-shadcn</code> theme. They are applied by the theme itself, so newly loaded pages and the login page pick them up immediately after saving."
+msgstr ""
+
+msgid "The <code>luci-theme-shadcn</code> theme is not installed. The settings below have no effect until it is."
+msgstr ""
+
+msgid "The theme integration file <code>/usr/share/ucode/luci/shadcn_config.uc</code> is missing, so the theme ignores the settings below. Re-apply <code>luci-theme-shadcn-patch</code> (or reinstall the theme package) to restore it."
+msgstr ""
+
+msgid "The installed theme does not include the shadcn-config integration. Apply <code>luci-theme-shadcn-patch</code> as described in the README, otherwise the settings below do not take effect."
+msgstr ""
+
+msgid "Day/night mode"
+msgstr ""
+
+msgid "The default colour scheme of the theme, and whether visitors may override it."
+msgstr ""
+
+msgid "Mode"
+msgstr ""
+
+msgid "Follow the system preference"
+msgstr ""
+
+msgid "Always light"
+msgstr ""
+
+msgid "Always dark"
+msgstr ""
+
+msgid "“Follow the system preference” re-evaluates the OS setting while a page is open, so switching the OS theme switches the theme here as well."
+msgstr ""
+
+msgid "Lock the mode"
+msgstr ""
+
+msgid "Ignore any per-browser preference and hide the toggle in the top bar. With “Follow the system preference” selected, every browser then tracks the OS setting permanently."
+msgstr ""
+
+msgid "Brand colour"
+msgstr ""
+
+msgid "Overrides the accent colour used for buttons, links, focus rings, active menu entries and the login button."
+msgstr ""
+
+msgid "Light mode colour"
+msgstr ""
+
+msgid "HEX value such as <code>#5e6ad2</code>. Leave empty to use the theme default (%s)."
+msgstr ""
+
+msgid "Dark mode colour"
+msgstr ""
+
+msgid "HEX value such as <code>#8b93ff</code>. Leave empty to reuse the light mode colour."
+msgstr ""
+
+msgid "Text on the brand colour"
+msgstr ""
+
+msgid "Either <code>auto</code> (pick black or white by brightness) or a HEX value."
+msgstr ""
+
+msgid "Text on the brand colour (dark mode)"
+msgstr ""
+
+msgid "Same as above; leave empty to reuse the light mode setting."
+msgstr ""
+
+msgid "Navigation layout"
+msgstr ""
+
+msgid "Where the main menu lives on desktop screens. Phones and narrow windows always keep the sidebar as a slide-in drawer."
+msgstr ""
+
+msgid "Menu position"
+msgstr ""
+
+msgid "Left sidebar"
+msgstr ""
+
+msgid "Top bar"
+msgstr ""
+
+msgid "The layout is part of the rendered page, so it changes with the next page load (save, then reload). Sub-menus open as dropdowns in top bar mode."
+msgstr ""
+
+msgid "Brand identity"
+msgstr ""
+
+msgid "Replaces the built-in logo and site icon. Uploaded files are stored in <code>%s</code> (outside the theme package, so they survive theme upgrades); SVG, PNG, ICO, WebP, GIF, JPG and AVIF up to %s are accepted."
+msgstr ""
+
+msgid "Logo"
+msgstr ""
+
+msgid "Theme default"
+msgstr ""
+
+msgid "Shown in the sidebar (or top bar) and on the login page."
+msgstr ""
+
+msgid "Site icon"
+msgstr ""
+
+msgid "Browser tab, bookmarks and the home screen icon. If the browser keeps showing the old icon, force-reload the page once."
+msgstr ""
+
+msgid "Upload logo"
+msgstr ""
+
+msgid "Upload a single image and select it as the logo. The same file can also be picked for the site icon afterwards."
+msgstr ""
+
+msgid "Upload logo…"
+msgstr ""
+
+msgid "Upload site icon"
+msgstr ""
+
+msgid "Upload a single image and select it as the site icon."
+msgstr ""
+
+msgid "Upload site icon…"
+msgstr ""
+
+msgid "Login wallpaper"
+msgstr ""
+
+msgid "Image shown on the right half of the login page. Uploaded images are stored in <code>%s</code>, which survives firmware upgrades."
+msgstr ""
+
+msgid "Wallpaper"
+msgstr ""
+
+msgid "Random on every visit"
+msgstr ""
+
+msgid "Online image"
+msgstr ""
+
+msgid "“Random on every visit” picks one of the uploaded images for every login page load. Uploaded files are listed at the bottom of this page and can be deleted there."
+msgstr ""
+
+msgid "Online image address"
+msgstr ""
+
+msgid "Direct <code>http://</code> or <code>https://</code> URL of an image, e.g. <code>https://picsum.photos/1920/1080?random={rand}</code>. Append <code>{rand}</code> so the browser fetches a new one on every login page load; it is replaced by a random number. A strict Content-Security-Policy on the router can block external images."
+msgstr ""
+
+msgid "Upload wallpaper"
+msgstr ""
+
+msgid "JPG, PNG, WebP, GIF or AVIF, up to %s and at least 64 bytes. Available space: %s."
+msgstr ""
+
+msgid "Upload image…"
+msgstr ""
+
+msgid "Wallpaper “%s” uploaded."
+msgstr ""
+
+msgid "Delete “%s”"
+msgstr ""
+
+msgid "Delete wallpaper “%s” ?"
+msgstr ""
+
+msgid "Wallpaper “%s” deleted."
+msgstr ""
+
+msgid "Failed to delete “%s”."
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Uploaded wallpapers"
+msgstr ""
+
+msgid "Delete icon file “%s” ?"
+msgstr ""
+
+msgid "Icon file “%s” deleted."
+msgstr ""
+
+msgid "Uploaded icon files"
+msgstr ""
+
+msgid "Shadcn Theme"
+msgstr ""

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-cn" data-shadcn-media="/luci-static/shadcn" data-shadcn-nav="topbar" data-darkmode="false">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="main.css">
+<link rel="stylesheet" href="nav-topbar.css">
+<style>
+  /* mock-only: pin the layout so the shell fills the window like a real page */
+  html, body { margin: 0; }
+  .mock-note { position: fixed; right: 12px; bottom: 10px; font: 12px/1.4 system-ui; opacity: .55; z-index: 999; }
+</style>
+</head>
+<body>
+<aside id="sidebar" data-media="/luci-static/shadcn" data-hostname="OpenWrt">
+  <div class="sidebar-header">
+    <a class="sidebar-brand" href="#">
+      <img class="sidebar-logo" src="../brand/custom-logo.svg" width="28" height="28" alt="">
+      <span class="sidebar-brand-text">OpenWrt</span>
+    </a>
+    <button class="sidebar-toggle" aria-label="collapse"><img src="icons/panel-left-close.svg" width="16" height="16" class="shadcn-icon"></button>
+  </div>
+  <nav class="sidebar-nav" id="sidebar-nav"><div class="sidebar-nav-item">
+  <a class="sidebar-nav-parent no-sub" href="#">
+    <span class="sidebar-icon" aria-hidden="true"><img src="icons/activity.svg" width="18" height="18" loadin="lazy" class="shadcn-icon"></span>
+    <span class="sidebar-label">状态</span>
+  </a>
+</div><div class="sidebar-accordion-item active" data-open="true" data-section="x">
+  <button class="sidebar-nav-parent" type="button">
+    <span class="sidebar-icon" aria-hidden="true"><img src="icons/settings.svg" width="18" height="18" class="shadcn-icon"></span>
+    <span class="sidebar-label">系统</span>
+    <span class="sidebar-chevron" aria-hidden="true"><img src="icons/chevron-down.svg" width="14" height="14" class="shadcn-icon"></span>
+  </button>
+  <div class="sidebar-accordion-sub"><ul class="sidebar-sub-list"><li class="sidebar-sub-item"><a class="sidebar-sub-link" href="#">系统</a></li><li class="sidebar-sub-item active"><a class="sidebar-sub-link" href="#">管理权</a></li><li class="sidebar-sub-item"><a class="sidebar-sub-link" href="#">软件包</a></li><li class="sidebar-sub-item"><a class="sidebar-sub-link" href="#">启动项</a></li></ul></div>
+</div><div class="sidebar-accordion-item" data-open="false" data-section="x">
+  <button class="sidebar-nav-parent" type="button">
+    <span class="sidebar-icon" aria-hidden="true"><img src="icons/network.svg" width="18" height="18" class="shadcn-icon"></span>
+    <span class="sidebar-label">网络</span>
+    <span class="sidebar-chevron" aria-hidden="true"><img src="icons/chevron-down.svg" width="14" height="14" class="shadcn-icon"></span>
+  </button>
+  <div class="sidebar-accordion-sub"><ul class="sidebar-sub-list"><li class="sidebar-sub-item"><a class="sidebar-sub-link" href="#">接口</a></li><li class="sidebar-sub-item"><a class="sidebar-sub-link" href="#">无线</a></li><li class="sidebar-sub-item"><a class="sidebar-sub-link" href="#">防火墙</a></li></ul></div>
+</div><div class="sidebar-accordion-item" data-open="false" data-section="x">
+  <button class="sidebar-nav-parent" type="button">
+    <span class="sidebar-icon" aria-hidden="true"><img src="icons/layers.svg" width="18" height="18" class="shadcn-icon"></span>
+    <span class="sidebar-label">服务</span>
+    <span class="sidebar-chevron" aria-hidden="true"><img src="icons/chevron-down.svg" width="14" height="14" class="shadcn-icon"></span>
+  </button>
+  <div class="sidebar-accordion-sub"><ul class="sidebar-sub-list"><li class="sidebar-sub-item"><a class="sidebar-sub-link" href="#">DHCP/DNS</a></li><li class="sidebar-sub-item"><a class="sidebar-sub-link" href="#">UPnP</a></li></ul></div>
+</div><div class="sidebar-accordion-item" data-open="false" data-section="x">
+  <button class="sidebar-nav-parent" type="button">
+    <span class="sidebar-icon" aria-hidden="true"><img src="icons/shield.svg" width="18" height="18" class="shadcn-icon"></span>
+    <span class="sidebar-label">VPN</span>
+    <span class="sidebar-chevron" aria-hidden="true"><img src="icons/chevron-down.svg" width="14" height="14" class="shadcn-icon"></span>
+  </button>
+  <div class="sidebar-accordion-sub"><ul class="sidebar-sub-list"><li class="sidebar-sub-item"><a class="sidebar-sub-link" href="#">OpenVPN</a></li></ul></div>
+</div><div class="sidebar-nav-item">
+  <a class="sidebar-nav-parent no-sub" href="#">
+    <span class="sidebar-icon" aria-hidden="true"><img src="icons/chart-bar.svg" width="18" height="18" loadin="lazy" class="shadcn-icon"></span>
+    <span class="sidebar-label">统计</span>
+  </a>
+</div><div class="sidebar-accordion-item" data-open="false" data-section="x">
+  <button class="sidebar-nav-parent" type="button">
+    <span class="sidebar-icon" aria-hidden="true"><img src="icons/container.svg" width="18" height="18" class="shadcn-icon"></span>
+    <span class="sidebar-label">Docker</span>
+    <span class="sidebar-chevron" aria-hidden="true"><img src="icons/chevron-down.svg" width="14" height="14" class="shadcn-icon"></span>
+  </button>
+  <div class="sidebar-accordion-sub" style="visibility:visible;opacity:1;transform:none"><ul class="sidebar-sub-list"><li class="sidebar-sub-item"><a class="sidebar-sub-link" href="#">容器</a></li><li class="sidebar-sub-item"><a class="sidebar-sub-link" href="#">镜像</a></li></ul></div>
+</div></nav>
+  <div class="sidebar-footer" id="sidebar-footer">
+    <a class="sidebar-logout" href="#">
+      <span class="sidebar-icon" aria-hidden="true"><img src="icons/log-out.svg" width="18" height="18" class="shadcn-icon"></span>
+      <span class="sidebar-label">退出登录</span>
+    </a>
+  </div>
+</aside>
+<div id="main-wrapper">
+  <div class="content-card">
+    <header class="card-header">
+      <div class="card-header-left">
+        <nav class="topbar-breadcrumb" aria-label="Navigation">
+          <span class="breadcrumb-item">系统</span>
+          <span class="breadcrumb-sep"><img src="icons/chevron-right.svg" width="14" height="14" class="shadcn-icon"></span>
+          <span class="breadcrumb-item active">Shadcn 主题</span>
+        </nav>
+      </div>
+      <div class="card-header-right">
+        <div id="indicators" class="topbar-indicators"></div>
+        <button class="topbar-icon-btn" aria-label="theme"><img src="icons/sun.svg" width="16" height="16" class="shadcn-icon"></button>
+      </div>
+    </header>
+    <div id="maincontent" tabindex="-1">
+      <h1>Shadcn 主题</h1>
+      <p>这是内容区域。顶栏模式下侧边栏变成顶部横向菜单，子菜单以下拉面板展开。</p>
+      <p>内容卡片占满整宽，滚动仍然发生在内容区内部。</p>
+    </div>
+  </div>
+</div>
+<div id="sidebar-overlay"></div>
+<div class="mock-note">nav-topbar mock</div>
+</body>
+</html>

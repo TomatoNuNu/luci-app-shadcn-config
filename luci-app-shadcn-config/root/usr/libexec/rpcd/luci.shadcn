@@ -1,0 +1,235 @@
+#!/bin/sh
+# luci-app-shadcn-config: rpcd backend
+#
+# Manages the login page wallpapers and the brand icons (logo / favicon) of the
+# luci-theme-shadcn theme:
+#   avail  - free space of the filesystem holding the upload directories
+#   status - theme / theme-integration probe used by the settings page
+#   remove - delete an uploaded wallpaper or brand icon
+#   import - move a previously uploaded file (cgi-upload) into place
+#
+# import/remove take an optional "kind": "wallpaper" (default) or "brand"
+# (logo / favicon). Uploaded files are validated (name, extension, magic bytes,
+# size -- and SVGs are scanned for scripting constructs) before they are made
+# reachable via /luci-static/shadcn/{wallpapers,brand}/.
+#
+# Licensed under the Apache License, Version 2.0.
+
+. /usr/share/libubox/jshn.sh
+
+readonly wp_dir='/www/luci-static/shadcn/wallpapers'
+readonly brand_dir='/www/luci-static/shadcn/brand'
+readonly tmp_file='/tmp/shadcn_wallpaper.tmp'
+readonly max_size=8388608	# 8 MiB (wallpapers)
+readonly brand_max_size=1048576	# 1 MiB (logo / favicon)
+
+result() {
+	printf '{ "result": %s }\n' "$1"
+}
+
+# Only plain file names living directly in the wallpaper directory are accepted.
+valid_name() {
+	case "$1" in
+		""|"."|".."|*/*|*\\*|.*) return 1 ;;
+	esac
+	return 0
+}
+
+# First bytes of the file must match the file extension.
+byte_at() {
+	dd if="$1" bs=1 skip="$2" count="$3" 2>/dev/null | hexdump -v -e '1/1 "%02x"'
+}
+
+check_image() {
+	case "$2" in
+		jpg|jpeg)
+			[ "$(byte_at "$1" 0 3)" = 'ffd8ff' ] ;;
+		png)
+			[ "$(byte_at "$1" 0 4)" = '89504e47' ] ;;
+		gif)
+			[ "$(byte_at "$1" 0 4)" = '47494638' ] ;;
+		webp)
+			[ "$(byte_at "$1" 0 4)" = '52494646' ] &&
+			[ "$(byte_at "$1" 8 4)" = '57454250' ] ;;
+		avif)
+			[ "$(byte_at "$1" 4 4)" = '66747970' ] &&
+			{ [ "$(byte_at "$1" 8 4)" = '61766966' ] ||
+			  [ "$(byte_at "$1" 8 4)" = '6d696631' ]; } ;;
+		ico)
+			[ "$(byte_at "$1" 0 4)" = '00000100' ] ;;
+		*)
+			return 1 ;;
+	esac
+}
+
+# SVG icons are accepted, but a direct visit to the uploaded file would execute
+# in the router's origin, so refuse documents carrying scripting constructs.
+# (Inside <img> / <link rel=icon> browsers never run them, but the file is also
+# reachable by URL.) This is a blacklist -- reject early and loudly instead of
+# trying to sanitise.
+check_svg() {
+	grep -qiE '<script|javascript:|<foreignobject|<!entity|<iframe|<embed|<object|data:text/html|[[:space:]]on[a-z]+[[:space:]]*=' "$1" && return 1
+
+	head -c 2048 "$1" | grep -qiE '<svg([[:space:]>]|$)' || return 1
+
+	return 0
+}
+
+# Find a free name inside $1 (name.ext, name-1.ext, ...)
+unique_name() {
+	local dir="$1" base="$2" ext="$3" candidate="$2.$3" n=0
+
+	while [ -e "$dir/$candidate" ]; do
+		n=$((n + 1))
+		[ "$n" -gt 100 ] && return 1
+		candidate="$base-$n.$ext"
+	done
+
+	printf '%s' "$candidate"
+}
+
+case "$1" in
+list)
+	printf '%s\n' '{"avail":{},"status":{},"remove":{"file":"filename","kind":"kind"},"import":{"file":"filename","kind":"kind"}}'
+	;;
+call)
+	case "$2" in
+	avail)
+		free="$(df -k "$wp_dir" 2>/dev/null | awk 'NR==2 { print $4 }')"
+		json_init
+		json_add_int result 0
+		json_add_int avail "${free:-0}"
+		json_dump
+		json_cleanup
+		;;
+	status)
+		theme=0
+		patched=0
+		module=0
+		count=0
+
+		[ -f /usr/share/ucode/luci/template/themes/shadcn/header.ut ] && theme=1
+		[ -f /usr/share/ucode/luci/shadcn_config.uc ] && module=1
+
+		# The theme only honours /etc/config/shadcn when its header template
+		# carries the integration *and* the module it requires at run time is
+		# present. Report both, so the settings page can point at the missing
+		# half instead of a generic "not patched".
+		header=0
+		grep -qs 'luci\.shadcn_config' /usr/share/ucode/luci/template/themes/shadcn/header.ut && header=1
+
+		[ "$theme" = 1 ] && [ "$module" = 1 ] && [ "$header" = 1 ] && patched=1
+
+		[ -d "$wp_dir" ] && count="$(ls -1 "$wp_dir" 2>/dev/null | wc -l)"
+
+		json_init
+		json_add_int result 0
+		json_add_int theme "$theme"
+		json_add_int patched "$patched"
+		json_add_int module "$module"
+		json_add_int count "${count:-0}"
+		json_dump
+		json_cleanup
+		;;
+	remove)
+		read -r input
+		json_load "$input" || { result 255; exit 0; }
+		json_get_var file file
+		json_get_var kind kind
+		json_cleanup
+
+		case "$kind" in
+			brand) dir="$brand_dir" ;;
+			*) dir="$wp_dir" ;;
+		esac
+
+		if ! valid_name "$file" || [ ! -f "$dir/$file" ] || [ -L "$dir/$file" ]; then
+			result 255
+			exit 0
+		fi
+
+		rm -f "$dir/$file" && result 0 || result 1
+		;;
+	import)
+		read -r input
+		json_load "$input" || { result 2; exit 0; }
+		json_get_var file file
+		json_get_var kind kind
+		json_cleanup
+
+		case "$kind" in
+			brand)
+				dir="$brand_dir"
+				max="$brand_max_size"
+				allowed='svg ico png webp gif jpg jpeg avif'
+				defbase='icon'
+				;;
+			*)
+				dir="$wp_dir"
+				max="$max_size"
+				allowed='jpg jpeg png webp gif avif'
+				defbase='wallpaper'
+				;;
+		esac
+
+		# Strip any path component, keep a conservative character set.
+		name="$(printf '%s' "$file" | sed -e 's#.*[/\\]##' |
+			tr -c 'A-Za-z0-9._-' '_' | cut -c1-64)"
+		ext="$(printf '%s' "$name" | tr 'A-Z' 'a-z' | sed -n 's/^.*\.\([a-z0-9]*\)$/\1/p')"
+
+		ok=0
+		for e in $allowed; do
+			[ "$ext" = "$e" ] && ok=1
+		done
+
+		if [ "$ok" != 1 ]; then
+			rm -f "$tmp_file"
+			result 3
+			exit 0
+		fi
+
+		[ -f "$tmp_file" ] && [ ! -L "$tmp_file" ] || { result 4; exit 0; }
+
+		size="$(wc -c < "$tmp_file")"
+		if [ "$size" -lt 64 ] || [ "$size" -gt "$max" ]; then
+			rm -f "$tmp_file"
+			result 5
+			exit 0
+		fi
+
+		if [ "$ext" = 'svg' ]; then
+			check_svg "$tmp_file" || { rm -f "$tmp_file"; result 6; exit 0; }
+		elif ! check_image "$tmp_file" "$ext"; then
+			rm -f "$tmp_file"
+			result 6
+			exit 0
+		fi
+
+		base="$(printf '%s' "$name" | sed -e 's/\.[^.]*$//')"
+		[ -n "$base" ] || base="$defbase"
+
+		mkdir -p "$dir" 2>/dev/null
+		chmod 0755 "$dir" 2>/dev/null
+
+		# Re-check the sanitized name, then find a free slot.
+		valid_name "$base.$ext" || { rm -f "$tmp_file"; result 2; exit 0; }
+
+		target="$(unique_name "$dir" "$base" "$ext")" || { rm -f "$tmp_file"; result 1; exit 0; }
+
+		if chmod 0644 "$tmp_file" 2>/dev/null && mv -f "$tmp_file" "$dir/$target"; then
+			json_init
+			json_add_int result 0
+			json_add_string file "$target"
+			json_dump
+			json_cleanup
+		else
+			rm -f "$tmp_file"
+			result 1
+		fi
+		;;
+	*)
+		exit 1
+		;;
+	esac
+	;;
+esac

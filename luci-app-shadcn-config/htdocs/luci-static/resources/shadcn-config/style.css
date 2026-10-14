@@ -1,0 +1,96 @@
+/*
+ * luci-app-shadcn-config: settings page additions.
+ *
+ * Kept theme-agnostic: the few colours used for the selection states follow
+ * the theme's --primary token, with a static fallback so the page also renders
+ * with other LuCI themes.
+ */
+
+/* ── Colour inputs ─────────────────────────────────────────────── */
+
+.shd-color-row {
+	display: flex;
+	align-items: center;
+	gap: .75rem;
+	flex-wrap: wrap;
+}
+
+.shd-color-input {
+	width: 2.75rem;
+	height: 2rem;
+	padding: 0;
+	border: 1px solid var(--border, #d4d4d8);
+	border-radius: .375rem;
+	background: transparent;
+	cursor: pointer;
+	flex: none;
+}
+
+.shd-color-input::-webkit-color-swatch-wrapper { padding: 2px; }
+.shd-color-input::-webkit-color-swatch { border: none; border-radius: .25rem; }
+.shd-color-input::-moz-color-swatch { border: none; border-radius: .25rem; }
+
+.shd-preview {
+	display: inline-flex;
+	align-items: center;
+	gap: .3rem;
+	font-size: .75rem;
+	flex-wrap: wrap;
+}
+
+.shd-preview > span {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 4.5rem;
+	padding: .35rem .6rem;
+	border-radius: var(--radius-base, .5rem);
+	border: 1px solid var(--border, #d4d4d8);
+}
+
+.shd-preview-solid {
+	background: var(--shd-brand);
+	color: var(--shd-brand-fg);
+	border-color: transparent;
+}
+
+.shd-preview-hover {
+	background: color-mix(in oklab, var(--shd-brand) 86%, white);
+	color: var(--shd-brand-fg);
+	border-color: transparent;
+}
+
+.shd-preview-soft {
+	background: color-mix(in srgb, var(--shd-brand) 12%, transparent);
+}
+
+/* ── Uploaded wallpaper list ───────────────────────────────────── */
+.shd-files {
+	display: flex;
+	flex-direction: column;
+	gap: .35rem;
+	margin: .25rem 0 0;
+}
+
+.shd-file {
+	display: flex;
+	align-items: center;
+	gap: .75rem;
+	padding: .35rem .6rem;
+	border: 1px solid var(--border, rgba(127, 127, 127, .25));
+	border-radius: var(--radius, .5rem);
+}
+
+.shd-file-name {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.shd-file-size {
+	flex: 0 0 auto;
+	opacity: .7;
+	font-variant-numeric: tabular-nums;
+}

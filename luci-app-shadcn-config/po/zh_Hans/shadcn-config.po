@@ -1,0 +1,255 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: luci-app-shadcn-config\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_Hans\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Failed to store the file (filesystem full or read-only)."
+msgstr "保存文件失败（文件系统已满或只读）。"
+
+msgid "Invalid request."
+msgstr "请求无效。"
+
+msgid "Unsupported file type. Please upload an SVG, PNG, ICO, WebP, GIF, JPG or AVIF image."
+msgstr "不支持的文件类型，请上传 SVG、PNG、ICO、WebP、GIF、JPG 或 AVIF 图片。"
+
+msgid "Unsupported file type. Please upload a JPG, PNG, WebP, GIF or AVIF image."
+msgstr "不支持的文件类型，请上传 JPG、PNG、WebP、GIF 或 AVIF 图片。"
+
+msgid "The uploaded file could not be found. Please try again."
+msgstr "未找到已上传的文件，请重试。"
+
+msgid "The file is too large (limit: %s)."
+msgstr "文件过大（上限 %s）。"
+
+msgid "The file contents do not match its extension, or the SVG contains active content (script, event handler, …) and was rejected."
+msgstr "文件内容与扩展名不符，或 SVG 中含可执行内容（脚本、事件处理器等）已被拒绝。"
+
+msgid "The file contents do not match its extension."
+msgstr "文件内容与扩展名不符。"
+
+msgid "Unknown error (%s)."
+msgstr "未知错误（%s）。"
+
+msgid "Expecting a HEX colour value such as %s."
+msgstr "需要 HEX 颜色值，例如 %s。"
+
+msgid "Expecting <code>auto</code> or a HEX colour value such as %s."
+msgstr "需要 <code>auto</code> 或 HEX 颜色值，例如 %s。"
+
+msgid "Expecting an <code>http://</code> or <code>https://</code> URL."
+msgstr "需要 <code>http://</code> 或 <code>https://</code> 开头的 URL。"
+
+msgid "The URL must not contain spaces, quotes, backslashes or angle brackets."
+msgstr "URL 里不能有空格、引号、反斜杠或尖括号。"
+
+msgid "Icon “%s” uploaded. Click “Save & Apply” to use it."
+msgstr "图标“%s”已上传。点击“保存并应用”后生效。"
+
+msgid "Colour picker"
+msgstr "取色器"
+
+msgid "Primary"
+msgstr "主色"
+
+msgid "Hover"
+msgstr "悬停"
+
+msgid "Active"
+msgstr "选中"
+
+msgid "Shadcn theme"
+msgstr "Shadcn 主题"
+
+msgid "Settings for the <code>luci-theme-shadcn</code> theme. They are applied by the theme itself, so newly loaded pages and the login page pick them up immediately after saving."
+msgstr "用于配置 <code>luci-theme-shadcn</code> 主题。设置由主题自身读取，保存后新打开的页面和登录页立即生效。"
+
+msgid "The <code>luci-theme-shadcn</code> theme is not installed. The settings below have no effect until it is."
+msgstr "未安装 <code>luci-theme-shadcn</code> 主题，以下设置暂不生效。"
+
+msgid "The theme integration file <code>/usr/share/ucode/luci/shadcn_config.uc</code> is missing, so the theme ignores the settings below. Re-apply <code>luci-theme-shadcn-patch</code> (or reinstall the theme package) to restore it."
+msgstr "主题集成文件 <code>/usr/share/ucode/luci/shadcn_config.uc</code> 缺失，主题会忽略下面的设置。请重新应用 <code>luci-theme-shadcn-patch</code>（或重装主题包）以恢复。"
+
+msgid "The installed theme does not include the shadcn-config integration. Apply <code>luci-theme-shadcn-patch</code> as described in the README, otherwise the settings below do not take effect."
+msgstr "当前主题未包含 shadcn-config 集成补丁。请按 README 应用 <code>luci-theme-shadcn-patch</code>，否则以下设置不会生效。"
+
+msgid "Day/night mode"
+msgstr "昼夜模式"
+
+msgid "The default colour scheme of the theme, and whether visitors may override it."
+msgstr "主题的默认配色方案，以及是否允许访客自行切换。"
+
+msgid "Mode"
+msgstr "模式"
+
+msgid "Follow the system preference"
+msgstr "跟随系统"
+
+msgid "Always light"
+msgstr "始终浅色"
+
+msgid "Always dark"
+msgstr "始终深色"
+
+msgid "“Follow the system preference” re-evaluates the OS setting while a page is open, so switching the OS theme switches the theme here as well."
+msgstr "“跟随系统”会在页面打开期间持续检测系统设置，切换系统深色/浅色后本主题随之切换。"
+
+msgid "Lock the mode"
+msgstr "锁定模式"
+
+msgid "Ignore any per-browser preference and hide the toggle in the top bar. With “Follow the system preference” selected, every browser then tracks the OS setting permanently."
+msgstr "忽略浏览器中的个人偏好并隐藏顶栏切换按钮。选择“跟随系统”时，所有浏览器将始终跟随系统设置。"
+
+msgid "Brand colour"
+msgstr "主色调"
+
+msgid "Overrides the accent colour used for buttons, links, focus rings, active menu entries and the login button."
+msgstr "覆盖按钮、链接、焦点框、菜单选中态以及登录按钮所使用的强调色。"
+
+msgid "Light mode colour"
+msgstr "浅色模式主色"
+
+msgid "HEX value such as <code>#5e6ad2</code>. Leave empty to use the theme default (%s)."
+msgstr "HEX 颜色值，例如 <code>#5e6ad2</code>。留空则使用主题默认（%s）。"
+
+msgid "Dark mode colour"
+msgstr "深色模式主色"
+
+msgid "HEX value such as <code>#8b93ff</code>. Leave empty to reuse the light mode colour."
+msgstr "HEX 颜色值，例如 <code>#8b93ff</code>。留空则与浅色模式主色相同。"
+
+msgid "Text on the brand colour"
+msgstr "主色上的文字颜色"
+
+msgid "Either <code>auto</code> (pick black or white by brightness) or a HEX value."
+msgstr "<code>auto</code> 表示按主色亮度自动选择黑/白，也可直接填写 HEX 值。"
+
+msgid "Text on the brand colour (dark mode)"
+msgstr "主色上的文字颜色（深色模式）"
+
+msgid "Same as above; leave empty to reuse the light mode setting."
+msgstr "含义同上；留空则沿用浅色模式的设置。"
+
+msgid "Navigation layout"
+msgstr "导航布局"
+
+msgid "Where the main menu lives on desktop screens. Phones and narrow windows always keep the sidebar as a slide-in drawer."
+msgstr "主菜单在桌面端的位置。手机和窄窗口始终使用可滑出的抽屉式侧边栏。"
+
+msgid "Menu position"
+msgstr "菜单位置"
+
+msgid "Left sidebar"
+msgstr "左侧边栏"
+
+msgid "Top bar"
+msgstr "顶栏"
+
+msgid "The layout is part of the rendered page, so it changes with the next page load (save, then reload). Sub-menus open as dropdowns in top bar mode."
+msgstr "布局是页面渲染的一部分，因此下一次加载页面时生效（保存后刷新）。顶栏模式下子菜单以下拉面板展开。"
+
+msgid "Brand identity"
+msgstr "品牌标识"
+
+msgid "Replaces the built-in logo and site icon. Uploaded files are stored in <code>%s</code> (outside the theme package, so they survive theme upgrades); SVG, PNG, ICO, WebP, GIF, JPG and AVIF up to %s are accepted."
+msgstr "替换主题自带的 Logo 和站点图标。上传的文件保存在 <code>%s</code>（在主题包之外，升级主题不会丢失）；支持 SVG、PNG、ICO、WebP、GIF、JPG、AVIF，最大 %s。"
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "Theme default"
+msgstr "主题自带"
+
+msgid "Shown in the sidebar (or top bar) and on the login page."
+msgstr "显示在侧边栏（或顶栏）与登录页左上角。"
+
+msgid "Site icon"
+msgstr "站点图标"
+
+msgid "Browser tab, bookmarks and the home screen icon. If the browser keeps showing the old icon, force-reload the page once."
+msgstr "浏览器标签页、书签和主屏图标。如果浏览器仍显示旧图标，强制刷新一次页面即可。"
+
+msgid "Upload logo"
+msgstr "上传 Logo"
+
+msgid "Upload a single image and select it as the logo. The same file can also be picked for the site icon afterwards."
+msgstr "上传一张图片并选为 Logo。同一个文件之后也可以再选作站点图标。"
+
+msgid "Upload logo…"
+msgstr "上传 Logo…"
+
+msgid "Upload site icon"
+msgstr "上传站点图标"
+
+msgid "Upload a single image and select it as the site icon."
+msgstr "上传一张图片并选为站点图标。"
+
+msgid "Upload site icon…"
+msgstr "上传站点图标…"
+
+msgid "Login wallpaper"
+msgstr "登录页壁纸"
+
+msgid "Image shown on the right half of the login page. Uploaded images are stored in <code>%s</code>, which survives firmware upgrades."
+msgstr "显示在登录页右半部分的图片。上传的图片保存在 <code>%s</code>，系统升级后依然保留。"
+
+msgid "Wallpaper"
+msgstr "壁纸"
+
+msgid "Random on every visit"
+msgstr "每次访问随机"
+
+msgid "Online image"
+msgstr "在线图片"
+
+msgid "“Random on every visit” picks one of the uploaded images for every login page load. Uploaded files are listed at the bottom of this page and can be deleted there."
+msgstr "“每次访问随机”会在每次登录页加载时从已上传图片中随机选择一张。已上传的文件列在本页底部，可在那里删除。"
+
+msgid "Online image address"
+msgstr "在线图片地址"
+
+msgid "Direct <code>http://</code> or <code>https://</code> URL of an image, e.g. <code>https://picsum.photos/1920/1080?random={rand}</code>. Append <code>{rand}</code> so the browser fetches a new one on every login page load; it is replaced by a random number. A strict Content-Security-Policy on the router can block external images."
+msgstr "图片的 <code>http://</code> 或 <code>https://</code> 直链，例如 <code>https://picsum.photos/1920/1080?random={rand}</code>。加上 <code>{rand}</code> 后每次打开登录页都会换成新图（该处会被替换成随机数）。路由器上若有严格的 Content-Security-Policy，可能拦截外部图片。"
+
+msgid "Upload wallpaper"
+msgstr "上传壁纸"
+
+msgid "JPG, PNG, WebP, GIF or AVIF, up to %s and at least 64 bytes. Available space: %s."
+msgstr "支持 JPG、PNG、WebP、GIF、AVIF，最大 %s，最小 64 字节。可用空间：%s。"
+
+msgid "Upload image…"
+msgstr "上传图片…"
+
+msgid "Wallpaper “%s” uploaded."
+msgstr "壁纸“%s”已上传。"
+
+msgid "Delete “%s”"
+msgstr "删除“%s”"
+
+msgid "Delete wallpaper “%s” ?"
+msgstr "确定删除壁纸“%s”？"
+
+msgid "Wallpaper “%s” deleted."
+msgstr "壁纸“%s”已删除。"
+
+msgid "Failed to delete “%s”."
+msgstr "删除“%s”失败。"
+
+msgid "Delete"
+msgstr "删除"
+
+msgid "Uploaded wallpapers"
+msgstr "已上传的壁纸"
+
+msgid "Delete icon file “%s” ?"
+msgstr "确定删除图标文件“%s”？"
+
+msgid "Icon file “%s” deleted."
+msgstr "图标文件“%s”已删除。"
+
+msgid "Uploaded icon files"
+msgstr "已上传的图标文件"
+
+msgid "Shadcn Theme"
+msgstr "Shadcn 主题"

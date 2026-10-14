@@ -1,0 +1,171 @@
+/*
+ * luci-theme-shadcn: top navigation bar.
+ *
+ * Loaded by header.ut only when /etc/config/shadcn has nav='topbar' (see
+ * luci-app-shadcn-config). Everything here is desktop-only: below 768px the
+ * sidebar keeps its existing drawer behaviour, which is what a phone needs.
+ *
+ * The markup is the one menu-shadcn.js already produces, so nothing has to be
+ * re-rendered:
+ *
+ *   #sidebar
+ *     .sidebar-header  > .sidebar-brand (logo + text) + .sidebar-toggle
+ *     .sidebar-nav     > .sidebar-nav-item    > a.sidebar-nav-parent
+ *                      > .sidebar-accordion-item[data-open]
+ *                          > button.sidebar-nav-parent
+ *                          > .sidebar-accordion-sub > ul.sidebar-sub-list
+ *     .sidebar-footer  > a.sidebar-logout
+ *
+ * Layout rules live in the theme's own stylesheet (_layout.css); this file only
+ * re-arranges them for the horizontal case.
+ */
+
+@media (min-width: 768px) {
+	/* The shell turns into a column: bar on top, content below. */
+	html[data-shadcn-nav="topbar"] body {
+		flex-direction: column;
+		flex-wrap: nowrap;
+	}
+
+	html[data-shadcn-nav="topbar"] #sidebar {
+		flex: 0 0 auto;
+		flex-direction: row;
+		align-items: center;
+		gap: .25rem;
+		width: 100%;
+		height: 3.5rem;
+		overflow: visible;
+		border-bottom: 1px solid var(--sidebar-border);
+	}
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-header {
+		flex: 0 0 auto;
+		height: auto;
+		padding: 0 .5rem 0 1rem;
+	}
+
+	/* The rail collapse has no meaning in a horizontal bar. */
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-toggle {
+		display: none;
+	}
+
+	/* ── the nav strip ─────────────────────────────────────────────── */
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-nav {
+		display: flex;
+		flex: 1 1 auto;
+		flex-direction: row;
+		align-items: center;
+		gap: .125rem;
+		min-width: 0;
+		padding: 0 .5rem;
+		overflow: visible;
+	}
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-nav-item,
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-item {
+		position: relative;
+		flex: 0 0 auto;
+		margin: 0;
+	}
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-nav-parent {
+		width: auto;
+		gap: .4rem;
+		padding: .4rem .65rem;
+		white-space: nowrap;
+	}
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-nav-parent .sidebar-label {
+		display: block;
+		flex: 0 0 auto;
+	}
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-brand-text,
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-chevron {
+		display: block;
+	}
+
+	/* ── dropdown instead of an inline accordion ───────────────────── */
+
+	/* An open accordion would otherwise stay expanded in the bar; the active
+	   section is highlighted instead. */
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-item[data-open="true"] > .sidebar-nav-parent {
+		background-color: transparent;
+		color: var(--sidebar-muted);
+	}
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-item:hover > .sidebar-nav-parent,
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-item[data-open="true"]:hover > .sidebar-nav-parent {
+		background-color: var(--sidebar-accent);
+		color: var(--sidebar-accent-fg);
+	}
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-item.active > .sidebar-nav-parent {
+		background-color: var(--sidebar-active-bg);
+		color: var(--sidebar-active-fg);
+	}
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-sub {
+		position: absolute;
+		top: calc(100% + .35rem);
+		left: 0;
+		z-index: 60;
+		display: block !important;	/* beats the collapsed-rail md:!hidden */
+		min-width: 12rem;
+		padding: .3rem;
+		visibility: hidden;
+		opacity: 0;
+		transform: translateY(-.25rem);
+		background-color: var(--panel-bg);
+		border: 1px solid var(--panel-border);
+		border-radius: .6rem;
+		box-shadow: 0 12px 32px -14px rgb(0 0 0 / .45);
+		transition: opacity .15s var(--ease-out), transform .15s var(--ease-out), visibility .15s;
+	}
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-item:hover > .sidebar-accordion-sub,
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-item:focus-within > .sidebar-accordion-sub {
+		visibility: visible;
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	/* Anchored to the right edge for the last entry, so it stays on screen. */
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-item:last-child > .sidebar-accordion-sub {
+		left: auto;
+		right: 0;
+	}
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-sub-list {
+		margin: 0;
+		padding: 0;
+		border: 0;
+	}
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-chevron,
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-item[data-open="true"] .sidebar-chevron {
+		transform: none;
+	}
+
+	/* ── logout at the far right ───────────────────────────────────── */
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-footer {
+		flex: 0 0 auto;
+		margin-left: auto;
+		padding: 0 1rem 0 0;
+		border-top: 0;
+	}
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-logout {
+		width: auto;
+		padding: .4rem .6rem;
+	}
+
+	/* ── content ───────────────────────────────────────────────────── */
+
+	/* No sidebar to sit next to, so the padding is symmetric again. */
+	html[data-shadcn-nav="topbar"] #main-wrapper {
+		padding: .5rem;
+	}
+}

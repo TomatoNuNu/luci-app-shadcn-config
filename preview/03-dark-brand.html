@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-cn" data-shadcn-media="/luci-static/shadcn" data-darkmode="true">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>OpenWrt - shadcn-config preview</title>
+<link rel="stylesheet" href="assets/login.css">
+<style>:root{--login-bg-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAoCAIAAAAt2Q6oAAAAQUlEQVR4nO3OAQkAIBAAsQ/xIeyf0BieMFiAze75zjwfSIdJS0sHSEtLB0hLSwdIS0sHSEtLB0hLSwdIS0sHfJm+RknuH7YVteEAAAAASUVORK5CYII=')}</style>
+<style id="shadcn-config">:root{--brand:#7c3aed;--primary:#7c3aed;--primary-foreground:#ffffff;--ring:#7c3aed;--focus-ring:color-mix(in srgb, #7c3aed 50%, transparent);--ring-a50:color-mix(in srgb, #7c3aed 50%, transparent);--primary-hover:color-mix(in oklab, #7c3aed 86%, #ffffff);--sidebar-active-bg:color-mix(in srgb, #7c3aed 12%, transparent);--sidebar-active-fg:color-mix(in oklab, #7c3aed 86%, #000000);--progress-bar-end:#7c3aed;--progress-bar-start:color-mix(in oklab, #7c3aed 60%, #ffffff);--login-path-stroke:#7c3aed;--primary-a5:color-mix(in srgb, #7c3aed 5%, transparent);--primary-a10:color-mix(in srgb, #7c3aed 10%, transparent);--primary-a15:color-mix(in srgb, #7c3aed 15%, transparent);--primary-a20:color-mix(in srgb, #7c3aed 20%, transparent);--primary-a25:color-mix(in srgb, #7c3aed 25%, transparent);--primary-a60:color-mix(in srgb, #7c3aed 60%, transparent);--primary-a70:color-mix(in srgb, #7c3aed 70%, transparent);--primary-a90:color-mix(in srgb, #7c3aed 90%, transparent);}
+[data-darkmode="true"]{--brand:#22d3ee;--primary:#22d3ee;--primary-foreground:#000000;--ring:#22d3ee;--focus-ring:color-mix(in srgb, #22d3ee 50%, transparent);--ring-a50:color-mix(in srgb, #22d3ee 50%, transparent);--primary-hover:color-mix(in oklab, #22d3ee 86%, #ffffff);--sidebar-active-bg:color-mix(in srgb, #22d3ee 14%, transparent);--sidebar-active-fg:color-mix(in oklab, #22d3ee 49%, #ffffff);--progress-bar-end:#22d3ee;--progress-bar-start:color-mix(in oklab, #22d3ee 60%, #161719);--login-path-stroke:#22d3ee;--primary-a5:color-mix(in srgb, #22d3ee 5%, transparent);--primary-a10:color-mix(in srgb, #22d3ee 10%, transparent);--primary-a15:color-mix(in srgb, #22d3ee 15%, transparent);--primary-a20:color-mix(in srgb, #22d3ee 20%, transparent);--primary-a25:color-mix(in srgb, #22d3ee 25%, transparent);--primary-a60:color-mix(in srgb, #22d3ee 60%, transparent);--primary-a70:color-mix(in srgb, #22d3ee 70%, transparent);--primary-a90:color-mix(in srgb, #22d3ee 90%, transparent);}</style>
+</head>
+<body class="lang_zh-cn">
+<main class="login-layout">
+	<section class="login-form-panel">
+		<span class="login-logo login-logo--topleft animate-element animate-delay-100">
+			<img src="assets/logo.svg" alt="" width="36" height="36">
+		</span>
+		<div class="login-form-wrap">
+			<div class="login-brand animate-element animate-delay-100">
+				<span class="login-hostname">OpenWrt</span>
+				<span class="login-subtitle">请输入用户名和密码。</span>
+			</div>
+			<form method="post" class="login-form">
+				<div class="login-field animate-element animate-delay-200">
+					<label class="login-label" for="luci_username">用户名</label>
+					<div class="login-input-glass">
+						<span class="login-input-icon"><img src="assets/user.svg" width="16" height="16" alt=""></span>
+						<input type="text" name="luci_username" id="luci_username" placeholder="用户名" value="root">
+					</div>
+				</div>
+				<div class="login-field animate-element animate-delay-300">
+					<label class="login-label" for="luci_password">密码</label>
+					<div class="login-input-glass">
+						<span class="login-input-icon"><img src="assets/lock.svg" width="16" height="16" alt=""></span>
+						<input type="password" name="luci_password" id="luci_password" placeholder="密码" value="secret">
+						<button type="button" class="login-pw-toggle"><img src="assets/eye.svg" width="16" height="16" alt=""></button>
+					</div>
+				</div>
+				<button type="submit" class="login-submit animate-element animate-delay-400">登录</button>
+			</form>
+		</div>
+		<footer class="login-footer">
+			<p>preview of luci-theme-shadcn + luci-app-shadcn-config</p>
+		</footer>
+	</section>
+	<section class="login-image-panel" aria-hidden="true">
+		<div class="login-image-inner animate-slide-right animate-delay-300"></div>
+	</section>
+</main>
+</body>
+</html>

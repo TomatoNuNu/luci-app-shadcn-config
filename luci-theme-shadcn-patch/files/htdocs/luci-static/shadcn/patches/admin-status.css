@@ -1,0 +1,43 @@
+/*
+ * Port status cards on narrow screens.
+ *
+ * luci-mod-status (view/status/include/29_ports.js) renders the grid inline:
+ *
+ *   <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))">
+ *     <div class="ifacebox" style="margin:.25em;min-width:70px;max-width:100px">
+ *
+ * while the theme raises the card minimum to 32 * --spacing (112px) and centres
+ * each card inside its track. A phone leaves roughly 100px per column, so the
+ * 112px wide boxes overflow their tracks by a few pixels on both sides and end
+ * up visually glued to their neighbours.
+ *
+ * Give the cards a comfortable minimum width instead -- auto-fit then lands on
+ * two columns on a phone (304px of content on a 360pt screen leaves room for
+ * 2 x 140px plus the gap, but not for three) and four on a small tablet -- and
+ * use a grid gap so the spacing does not depend on the inline margins.
+ *
+ * Loaded as a per-page patch: the file name matches the "admin/status" path
+ * prefix, so it only ships with the status pages (see the patches handling in
+ * header.ut).
+ */
+@media (max-width: 900px) {
+	.cbi-section div[style*="display:grid"]:has(> .ifacebox) {
+		/* inline style, hence !important */
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+		gap: calc(var(--spacing) * 3);
+		place-items: stretch;
+	}
+
+	/* Let the cards fill the whole track -- the inline max-width would keep
+	   them at 100px and centre them again. */
+	.cbi-section div[style*="display:grid"]:has(> .ifacebox) > .ifacebox {
+		max-width: none !important;
+		margin: 0 !important;
+	}
+
+	/* With the card stretched, the traffic figures and the port name stay on
+	   one line more often; keep them from wrapping awkwardly. */
+	.cbi-section div[style*="display:grid"]:has(> .ifacebox) > .ifacebox .ifacebox-body {
+		min-width: 0;
+	}
+}

@@ -1,0 +1,26 @@
+
+config global
+	# 昼夜模式策略: auto = 跟随系统 / light = 强制浅色 / dark = 强制深色
+	option mode 'auto'
+	# 1 = 锁定模式，访问者无法用顶栏按钮手动切换（auto 时始终实时跟随系统）
+	option lock_mode '0'
+	# 主色调（HEX），空 = 使用主题内置色 #5e6ad2
+	option brand ''
+	# 深色模式主色调（HEX），空 = 与 brand 相同
+	option brand_dark ''
+	# 主色调上的文字色: auto = 按亮度自动取黑/白，也可填 HEX
+	option brand_fg 'auto'
+	# 深色模式下的文字色: auto = 同上，空 = 与 brand_fg 相同
+	option brand_fg_dark 'auto'
+	# 登录页壁纸: default = 主题自带 / random = 每次从已上传图片中随机 / online = 在线图片 / <文件名>
+	# （旧配置里的 none 现在等同于 default）
+	option login_bg 'default'
+	# 在线壁纸地址: http(s) 图片直链；含 {rand} 时每次加载替换为随机数（对会缓存结果的图源有用）
+	option login_bg_url ''
+
+	# 导航布局: sidebar = 左侧边栏（默认）/ topbar = 顶部横向菜单（仅桌面端，窄屏仍是抽屉侧边栏）
+	option nav 'sidebar'
+
+	# 品牌图标: 空 = 主题自带；值 = brand 目录下的文件名（在设置页上传）
+	option logo ''
+	option favicon ''

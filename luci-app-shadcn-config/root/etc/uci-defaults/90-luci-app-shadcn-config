@@ -1,0 +1,23 @@
+#!/bin/sh
+# luci-app-shadcn-config: first install / upgrade preparation
+
+# The theme looks for user wallpapers below its own static directory.
+mkdir -p /www/luci-static/shadcn/wallpapers 2>/dev/null
+chmod 0755 /www/luci-static/shadcn/wallpapers 2>/dev/null
+
+# Make sure the theme shows up in the LuCI theme selector.
+# The theme package registers itself too, but its uci-defaults refuses to run
+# when opkg treats the install as an upgrade (PKG_UPGRADE=1); registering here
+# again keeps the theme selectable on such setups. The currently selected theme
+# is deliberately left alone -- switching is the theme package's job and a
+# manual `uci set luci.main.mediaurlbase=/luci-static/shadcn` is always possible.
+if [ -x /sbin/uci ] || [ -x /bin/uci ] || command -v uci >/dev/null 2>&1; then
+	if ! uci -q get luci.themes.Shadcn >/dev/null 2>&1; then
+		uci -q set luci.themes.Shadcn='/luci-static/shadcn' && uci -q commit luci
+	fi
+fi
+
+# Drop the upload scratch file left over by an interrupted upload.
+rm -f /tmp/shadcn_wallpaper.tmp
+
+exit 0

@@ -1,0 +1,23 @@
+{
+	"luci-app-shadcn-config": {
+		"description": "Grant access to the shadcn theme configuration",
+		"read": {
+			"file": {
+				"/www/luci-static/shadcn/wallpapers/*": [ "list" ]
+			},
+			"ubus": {
+				"luci.shadcn": [ "avail", "status" ]
+			},
+			"uci": [ "shadcn" ]
+		},
+		"write": {
+			"file": {
+				"/tmp/shadcn_wallpaper.tmp": [ "write" ]
+			},
+			"ubus": {
+				"luci.shadcn": [ "remove", "import" ]
+			},
+			"uci": [ "shadcn" ]
+		}
+	}
+}
