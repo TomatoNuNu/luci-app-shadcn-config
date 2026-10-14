@@ -165,7 +165,7 @@ opkg install ./luci-i18n-shadcn-config-zh-cn_1.0.8-r20261013_all.ipk   # 可选
 
 这些包是 `LUCI_PKGARCH=all` 的纯文件包（脚本/模板/前端资源），不含任何编译产物，所以可以脱离  
 OpenWrt 工具链打包；容器格式与官方包完全一致（`gzip(tar)` 内含 `./debian-binary`、`./data.tar.gz`、  
-`./control.tar.gz`），已对照 21.02 / 23.05 / 24.10 的官方 ipk 逐项比对（详见"已做的验证"）。
+`./control.tar.gz`），已对照 21.02 / 23.05 / 24.10 的官方 ipk 逐项比对。
 
 两点须知：
 
@@ -206,56 +206,6 @@ python3 tools/check-ipk.py dist/*.ipk        # 安装前离线自检（结构/�
 
 说明：**非锁定模式下**，服务端 `mode` 只决定访客“首次访问的默认值”，之后访客用顶栏按钮自行切换并保存在浏览器里；  
 **锁定模式**下服务端策略始终优先（`auto` 即永久实时跟随系统）。
-
----
-
-## 预览
-
-`preview/` 目录里是用**真实主题样式表 + 真实 ucode 模块生成**的登录页渲染结果（可直接用浏览器打开 HTML，图片已内联）：
-
-| 文件                          | 场景                          |
-| --------------------------- | --------------------------- |
-| `shot-01-light-default.png` | 全部默认（主题自带壁纸、默认主色 `#5e6ad2`） |
-| `shot-02-light-brand.png`   | 浅色 + 主色 `#0f766e` + 自选壁纸    |
-| `shot-03-dark-brand.png`    | 深色 + 深色主色 `#22d3ee`（自动黑色文字）               |  
-| `shot-04-light-bright.png`  | 亮黄主色 `#ffd700` → 前景自动取黑                   |  
-
-下面三张是**真正跑通整条链路**的结果：用编译好的 ucode 解释器按 LuCI 的方式渲染打了补丁的主题模板（`sysauth.ut → header 转发模板 → themes/shadcn/header.ut`），再经本地 HTTP 服务加载真实 `login.css` 与壁纸后截图：
-
-| 文件                       | 对应 `/etc/config/shadcn`                                                                  |
-| ------------------------ | ---------------------------------------------------------------------------------------- |
-| `real-render-login.png`  | `mode=dark` + `lock_mode=1` + `brand=#7c3aed` / `brand_dark=#22d3ee` + `login_bg=random` |
-| `real-render-light.png`  | `mode=light` + `brand=#0f766e` + `login_bg=default`（首次访问被服务端默认值置为浅色）                     |
-| `real-render-bright.png` | `brand=#ffd700`，浏览器报告系统为深色 → 自动跟随系统 + 主色上的黑色文字                                           |
-
-`preview/verify/` 里是复现用的脚本（模板渲染桩 `render.uc`、本地静态服务 `preview_server.py`、`uci` 桩模块）  
-以及一份渲染出来的 HTML 样例。
-
----
-
-## 已做的验证
-
-- `ucode` 解释器（本地编译）**编译检查通过**：主题补丁后的 `header.ut` / `sysauth.ut` / `footer.ut` 与 `shadcn_config.uc` 均无语法错误
-- 模块逻辑**单元测试通过**（用桩 `uci` 模块喂真实 UCI 文件）：默认值、HEX 归一化（`#abc`→`#aabbcc`）、非法值回退、  
-  自动前景色（深色主色→白字、亮黄→黑字）、`default`/`random`/指定文件三种壁纸取值、文件不存在回退、随机抽取只挑图片
-- 补丁在**全新克隆的上游仓库**上 `git apply --check` 与 `git apply` 均成功
-- 视图 JS `node --check` 通过；`menu.d`/`acl.d` JSON 校验通过；`rpcd`/`uci-defaults` shell `sh -n` 通过
-- 用真实主题 CSS + 生成页面做了**无头浏览器渲染验证**（见 `preview/`），确认亮/暗两套 token 覆盖优先级、壁纸回退与自动前景色均符合预期
-- **整条链路渲染验证**：用本地编译的 ucode 按 LuCI 的方式渲染打了补丁的模板  
-  （`sysauth.ut` → luci-base 的 header 转发模板 → `themes/shadcn/header.ut`），再用 HTTP 加载真实 `login.css`  
-  与壁纸截图，见 `preview/real-render-*.png`
-- **安装后闭环验证**：改从 `dist/` 的 ipk 里解出文件渲染 —— 默认配置下**不注入任何覆盖样式**  
-  （`id="shadcn-config"` 出现 0 次），壁纸回落到主题自带图，行为与未安装本应用时完全一致；  
-  配了主色/锁定/随机壁纸时输出与源码树版本一致
-- **ipk 结构与官方包逐项比对**：容器为 `gzip(tar)` 内含 `./debian-binary`（`2.0`）、`./data.tar.gz`、  
-  `./control.tar.gz`（与 21.02 / 23.05 / 24.10 官方 luci 包一致），条目带 `./` 前缀、含目录条目、  
-  `uid/gid=0`、脚本 `0755`；`control` 字段与顺序照 24.10 luci.mk 产物；`conffiles` 指向的  
-  `/etc/config/shadcn` 确实在 payload 中；三个包均通过 `tools/check-ipk.py` 自检（sha256 见打包输出）
-
-> 说明：本机是 macOS 且无 Docker，官方 SDK 只有 Linux x86_64 host 版本，因此**没有在真实 opkg 上跑过安装**。  
-> 上述结论来自：与官方 ipk 的逐项结构比对 + 按 opkg 读取流程实现的离线自检 + 包内文件的语法/编译校验 +  
-> 用包内文件完成的渲染闭环。首次安装前建议备份 `/etc/config/shadcn` 与 `/etc/config/luci`，并保持  
-> `opkg install` 的固件版本在 23.05 ~ 24.10（apk 系的 25.12+ 需要自行用源码树编译 `apk`）。
 
 ---
 
