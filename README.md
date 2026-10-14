@@ -83,26 +83,33 @@ LuCI 的主题模板只能由主题包自身提供：`luci.runtime` 把模板目
 
 ## 构建与安装
 
+> **只是想装到路由器上用？** 直接看「3. 或者直接用打好的 ipk」——主题包已内置集成，不需要打补丁。
+> 第 1、2 节是给需要在上游主题源码上打补丁、或自行编译的人（例如 apk 系的 25.12+ 官方固件）。
+
 ### 1. 给 luci-theme-shadcn 打补丁
+
+补丁文件在本仓库的 `luci-theme-shadcn-patch/` 目录（也可从本 Release 下载
+`0001-luci-app-shadcn-config-integration.patch`）：
 
 ```sh
 git clone https://github.com/eamonxg/luci-theme-shadcn.git
 cd luci-theme-shadcn
-git apply /path/to/luci-theme-shadcn-patch/0001-luci-app-shadcn-config-integration.patch
+git apply <本仓库>/luci-theme-shadcn-patch/0001-luci-app-shadcn-config-integration.patch
 # 或者： patch -p1 < 0001-luci-app-shadcn-config-integration.patch
 ```
 
-补丁基于上游提交 `17c37b59ea244e7de89e4e3b3de3b85690ec9d04`（main 分支）生成，只改动 3 个文件：
+补丁基于上游提交 `17c37b59ea244e7de89e4e3b3de3b85690ec9d04`（main 分支）生成，共改动/新增 6 个文件：
 
-- `ucode/template/themes/shadcn/header.ut`：读取配置、注入 token 与模式策略
-- `ucode/template/themes/shadcn/sysauth.ut`：登录页壁纸
-- `root/usr/share/ucode/luci/shadcn_config.uc`：新增的主题侧读取/校验脚本（脚本式，不是模块）
+- 改动 `ucode/template/themes/shadcn/header.ut` / `sysauth.ut`：读取配置、注入 token 与模式策略、登录页壁纸
+- 新增 `root/usr/share/ucode/luci/shadcn_config.uc`（主题侧读取/校验）、`htdocs/luci-static/shadcn/nav-topbar.css`（顶栏模式）、`htdocs/luci-static/shadcn/patches/admin-status.css`（状态页窄屏修复）
+- `Makefile`：版本号提升（避免被 feed 上的未打补丁版覆盖）
 
-不想用 git 的话，直接把 `luci-theme-shadcn-patch/files/` 里的 3 个文件覆盖到主题源码对应路径即可。
+不想用 git 的话，直接把 `luci-theme-shadcn-patch/files/` 里的文件覆盖到主题源码对应路径即可。
 
 **主题已经装在路由器上了（原版主题 + 本应用，设置页提示"需要集成补丁"）？** 不用重装主题，也不用 `git`：  
-路由器上没有 `git`/`patch`，用 `tools/install-theme-patch.sh` —— 3 个文件已内嵌在脚本里，它自己完成  
-备份（`/root/shadcn-config-patch-backup/`）、写入、校验、清缓存，结果与 `git apply` **逐字节一致**：
+路由器上没有 `git`/`patch`，用 `install-theme-patch.sh`（位于本仓库 `tools/`，Release 页也可直接下载）
+—— 补丁内容已全部内嵌在脚本里，它自己完成备份（`/root/shadcn-config-patch-backup/`）、写入、校验、清缓存，
+结果与 `git apply` **逐字节一致**：
 
 ```sh
 scp tools/install-theme-patch.sh root@<路由器IP>:/tmp/
