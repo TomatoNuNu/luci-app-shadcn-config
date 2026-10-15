@@ -1,16 +1,15 @@
 diff --git a/Makefile b/Makefile
-index d36e06c..4bdf7c4 100644
+index d36e06c..823374e 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -9,7 +9,10 @@ LUCI_TITLE:=A modern sidebar LuCI theme for OpenWrt, built with shadcn/ui design
+@@ -9,7 +9,9 @@ LUCI_TITLE:=A modern sidebar LuCI theme for OpenWrt, built with shadcn/ui design
  LUCI_DEPENDS:=+luci-base
  
  PKG_VERSION:=0.6.0
 -PKG_RELEASE:=20260920
 +# Bumped by the luci-app-shadcn-config integration patch so that packages built
-+# from this tree sort above the unpatched upstream release of the same version
-+# (the .2 suffix keeps it above the first patched build, which broke the theme).
-+PKG_RELEASE:=20261013.7
++# from this tree sort above the unpatched upstream release of the same version.
++PKG_RELEASE:=20261013.9
  PKG_LICENSE:=Apache-2.0
  
  LUCI_MINIFY_CSS:=
@@ -191,12 +190,60 @@ index 0000000..195d527
 +		padding: .5rem;
 +	}
 +}
+diff --git a/htdocs/luci-static/shadcn/patches/admin-network.css b/htdocs/luci-static/shadcn/patches/admin-network.css
+new file mode 100644
+index 0000000..ad2d765
+--- /dev/null
++++ b/htdocs/luci-static/shadcn/patches/admin-network.css
+@@ -0,0 +1,42 @@
++/*
++ * Network pages (luci-mod-network：接口 / DHCP / 路由 / 无线 …).
++ * 匹配 admin/network/* 路径前缀，只在网络相关页面加载。
++ */
++
++/* ────────────────────────────────────────────────────────────────────────
++ * ifacebox 比例调整：图标放大、留白收紧
++ *
++ * 背景：主题把 ifacebox 里的图标宽度定在 --spacing × 5（约 17.5px）、
++ * body 内边距 3 × --spacing（约 10.5px），在这两个页面（端口状态卡片 /
++ * 网络接口卡片）里显得"框大、图标小"。
++ *
++ * 调大图标、收紧 padding/gap，让卡片更紧凑、图标占比更高。
++ * ──────────────────────────────────────────────────────────────────────── */
++
++/* 留白：body 10.5px -> 7px，间距 3.5px -> 1.75px；head 上下 7px -> 5.25px */
++.ifacebox .ifacebox-body { padding: 7px; gap: 1.75px; }
++.ifacebox .ifacebox-head { padding-block: 5.25px; }
++
++/* 图标：主图标 17.5px -> 26.25px；行内小图标 17.5px -> 21px（保持单行排布） */
++.ifacebox .ifacebox-body > img { width: 26.25px; }
++.ifacebox .ifacebox-body > span img { width: 21px; }
++/* ────────────────────────────────────────────────────────────────────────
++ * ifacebox 比例调整：图标放大、留白收紧（第二版：进一步压矮）
++ *
++ * 背景：主题把 ifacebox 里的图标宽度定在 --spacing × 5（约 17.5px）、
++ * body 内边距 3 × --spacing（约 10.5px），卡片显得"框大、图标小"。
++ * 第一版放大图标并收紧留白；本版继续压缩纵向高度：
++ *   - body 上下内边距 7px -> 3.5px（左右保持 7px），行距归零
++ *   - head 上下 5.25px -> 3.5px
++ *   - 隐藏 body 直接子级的 <br>（纵向 flex layout 下它是多余的一行）
++ * ──────────────────────────────────────────────────────────────────────── */
++
++.ifacebox .ifacebox-body { padding: 3.5px 7px; gap: 0; }
++.ifacebox .ifacebox-head { padding-block: 3.5px; }
++
++/* 纵向 flex 布局下 <br> 只是多占一行高度（正文换行由 flex 自身完成） */
++.ifacebox .ifacebox-body > br { display: none; }
++
++/* 图标：主图标 17.5px -> 26.25px；行内小图标 17.5px -> 21px（保持单行排布） */
++.ifacebox .ifacebox-body > img { width: 26.25px; }
++.ifacebox .ifacebox-body > span img { width: 21px; }
 diff --git a/htdocs/luci-static/shadcn/patches/admin-status.css b/htdocs/luci-static/shadcn/patches/admin-status.css
 new file mode 100644
-index 0000000..800dfc3
+index 0000000..9729314
 --- /dev/null
 +++ b/htdocs/luci-static/shadcn/patches/admin-status.css
-@@ -0,0 +1,43 @@
+@@ -0,0 +1,63 @@
 +/*
 + * Port status cards on narrow screens.
 + *
@@ -240,6 +287,26 @@ index 0000000..800dfc3
 +		min-width: 0;
 +	}
 +}
++/* ────────────────────────────────────────────────────────────────────────
++ * ifacebox 比例调整：图标放大、留白收紧（第二版：进一步压矮）
++ *
++ * 背景：主题把 ifacebox 里的图标宽度定在 --spacing × 5（约 17.5px）、
++ * body 内边距 3 × --spacing（约 10.5px），卡片显得"框大、图标小"。
++ * 第一版放大图标并收紧留白；本版继续压缩纵向高度：
++ *   - body 上下内边距 7px -> 3.5px（左右保持 7px），行距归零
++ *   - head 上下 5.25px -> 3.5px
++ *   - 隐藏 body 直接子级的 <br>（纵向 flex layout 下它是多余的一行）
++ * ──────────────────────────────────────────────────────────────────────── */
++
++.ifacebox .ifacebox-body { padding: 3.5px 7px; gap: 0; }
++.ifacebox .ifacebox-head { padding-block: 3.5px; }
++
++/* 纵向 flex 布局下 <br> 只是多占一行高度（正文换行由 flex 自身完成） */
++.ifacebox .ifacebox-body > br { display: none; }
++
++/* 图标：主图标 17.5px -> 26.25px；行内小图标 17.5px -> 21px（保持单行排布） */
++.ifacebox .ifacebox-body > img { width: 26.25px; }
++.ifacebox .ifacebox-body > span img { width: 21px; }
 diff --git a/root/usr/share/ucode/luci/shadcn_config.uc b/root/usr/share/ucode/luci/shadcn_config.uc
 new file mode 100644
 index 0000000..f540c5f

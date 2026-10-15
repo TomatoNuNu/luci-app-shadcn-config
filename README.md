@@ -98,10 +98,10 @@ git apply <本仓库>/luci-theme-shadcn-patch/0001-luci-app-shadcn-config-integr
 # 或者： patch -p1 < 0001-luci-app-shadcn-config-integration.patch
 ```
 
-补丁基于上游提交 `17c37b59ea244e7de89e4e3b3de3b85690ec9d04`（main 分支）生成，共改动/新增 6 个文件：
+补丁基于上游提交 `17c37b59ea244e7de89e4e3b3de3b85690ec9d04`（main 分支）生成，共改动/新增 7 个文件：
 
 - 改动 `ucode/template/themes/shadcn/header.ut` / `sysauth.ut`：读取配置、注入 token 与模式策略、登录页壁纸
-- 新增 `root/usr/share/ucode/luci/shadcn_config.uc`（主题侧读取/校验）、`htdocs/luci-static/shadcn/nav-topbar.css`（顶栏模式）、`htdocs/luci-static/shadcn/patches/admin-status.css`（状态页窄屏修复）
+- 新增 `root/usr/share/ucode/luci/shadcn_config.uc`（主题侧读取/校验）、`htdocs/luci-static/shadcn/nav-topbar.css`（顶栏模式）、`htdocs/luci-static/shadcn/patches/admin-status.css` 与 `admin-network.css`（状态页 / 网络页的卡片比例调整）
 - `Makefile`：版本号提升（避免被 feed 上的未打补丁版覆盖）
 
 不想用 git 的话，直接把 `luci-theme-shadcn-patch/files/` 里的文件覆盖到主题源码对应路径即可。

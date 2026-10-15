@@ -1,0 +1,42 @@
+/*
+ * Network pages (luci-mod-network：接口 / DHCP / 路由 / 无线 …).
+ * 匹配 admin/network/* 路径前缀，只在网络相关页面加载。
+ */
+
+/* ────────────────────────────────────────────────────────────────────────
+ * ifacebox 比例调整：图标放大、留白收紧
+ *
+ * 背景：主题把 ifacebox 里的图标宽度定在 --spacing × 5（约 17.5px）、
+ * body 内边距 3 × --spacing（约 10.5px），在这两个页面（端口状态卡片 /
+ * 网络接口卡片）里显得"框大、图标小"。
+ *
+ * 调大图标、收紧 padding/gap，让卡片更紧凑、图标占比更高。
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/* 留白：body 10.5px -> 7px，间距 3.5px -> 1.75px；head 上下 7px -> 5.25px */
+.ifacebox .ifacebox-body { padding: 7px; gap: 1.75px; }
+.ifacebox .ifacebox-head { padding-block: 5.25px; }
+
+/* 图标：主图标 17.5px -> 26.25px；行内小图标 17.5px -> 21px（保持单行排布） */
+.ifacebox .ifacebox-body > img { width: 26.25px; }
+.ifacebox .ifacebox-body > span img { width: 21px; }
+/* ────────────────────────────────────────────────────────────────────────
+ * ifacebox 比例调整：图标放大、留白收紧（第二版：进一步压矮）
+ *
+ * 背景：主题把 ifacebox 里的图标宽度定在 --spacing × 5（约 17.5px）、
+ * body 内边距 3 × --spacing（约 10.5px），卡片显得"框大、图标小"。
+ * 第一版放大图标并收紧留白；本版继续压缩纵向高度：
+ *   - body 上下内边距 7px -> 3.5px（左右保持 7px），行距归零
+ *   - head 上下 5.25px -> 3.5px
+ *   - 隐藏 body 直接子级的 <br>（纵向 flex layout 下它是多余的一行）
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.ifacebox .ifacebox-body { padding: 3.5px 7px; gap: 0; }
+.ifacebox .ifacebox-head { padding-block: 3.5px; }
+
+/* 纵向 flex 布局下 <br> 只是多占一行高度（正文换行由 flex 自身完成） */
+.ifacebox .ifacebox-body > br { display: none; }
+
+/* 图标：主图标 17.5px -> 26.25px；行内小图标 17.5px -> 21px（保持单行排布） */
+.ifacebox .ifacebox-body > img { width: 26.25px; }
+.ifacebox .ifacebox-body > span img { width: 21px; }
