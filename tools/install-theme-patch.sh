@@ -4,7 +4,7 @@
 # (install the shadcn-config integration patch onto an already installed theme)
 #
 # 与 luci-theme-shadcn-patch/0001-luci-app-shadcn-config-integration.patch 完全等价：
-# 路由器上没有 git/patch，所以这里直接替换那 6 个受影响的文件。
+# 路由器上没有 git/patch，所以这里直接替换那 8 个受影响的文件。
 #
 #   写入：
 #     /usr/share/ucode/luci/template/themes/shadcn/header.ut
@@ -13,6 +13,8 @@
 #     /www/luci-static/shadcn/nav-topbar.css                （新增，顶栏布局样式）
 #     /www/luci-static/shadcn/patches/admin-status.css      （新增，状态页修复）
 #     /www/luci-static/shadcn/patches/admin-network.css     （新增，网络页卡片比例）
+#     /www/luci-static/shadcn/patches/admin-services-passwall.css（新增，PassWall 卡片对齐）
+#     /www/luci-static/shadcn/patches/admin-system-filetransfer.css（新增，文件传输页按钮）
 #
 #   原文件自动备份到 /root/shadcn-config-patch-backup/（重复运行不会覆盖首次备份）
 #
@@ -24,7 +26,7 @@
 #   cp -p /root/shadcn-config-patch-backup/header.ut  /usr/share/ucode/luci/template/themes/shadcn/
 #   cp -p /root/shadcn-config-patch-backup/sysauth.ut /usr/share/ucode/luci/template/themes/shadcn/
 #   rm -f /usr/share/ucode/luci/shadcn_config.uc
-#   rm -f /www/luci-static/shadcn/nav-topbar.css /www/luci-static/shadcn/patches/admin-status.css /www/luci-static/shadcn/patches/admin-network.css
+#   rm -f /www/luci-static/shadcn/nav-topbar.css /www/luci-static/shadcn/patches/admin-status.css /www/luci-static/shadcn/patches/admin-network.css /www/luci-static/shadcn/patches/admin-services-passwall.css /www/luci-static/shadcn/patches/admin-system-filetransfer.css
 #   rm -f /tmp/luci-indexcache.*; rm -rf /tmp/luci-modulecache; /etc/init.d/rpcd reload
 #
 
@@ -1235,6 +1237,33 @@ cat > "$THEME_MEDIA/patches/admin-status.css" <<'SHADCN_PATCH_PAYLOAD_EOF'
 /* 图标：主图标 17.5px -> 26.25px；行内小图标 17.5px -> 21px（保持单行排布） */
 .ifacebox .ifacebox-body > img { width: 26.25px; }
 .ifacebox .ifacebox-body > span img { width: 21px; }
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 无线区块的强调色（与「网络」区块的 ifacebox-head.active 保持一致）
+ *
+ * 状态页里「网络」区块的卡片头在接口可用时带 .active（主题据此上主色），
+ * 而「无线」区块（60_wifi.js）的 ifacebox-head 只在 radio.isUp() 为真时
+ * 才带 .active —— 部分固件上该判定不返回真，卡片头就一直是灰白；
+ * 「已连接站点」的网络徽标也没有任何强调色。
+ *
+ * 这里按区块兜底：无线卡片头统一用主色（与网络卡片视觉一致）。
+ * 依赖 #wifi_assoclist_table（60_wifi.js 的固定 id）定位无线区块。
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.cbi-section:has(#wifi_assoclist_table) .network-status-table .ifacebox-head {
+	background-color: var(--primary);
+	border-color: var(--primary);
+	color: var(--primary-foreground);
+}
+
+/* 端口状态卡片：端口名标题条也用主色（与网络 / 无线卡片统一）。
+   端口卡片里有两个 .ifacebox-head：第一个是端口名，第二个是 zone 色条
+   （cbi-tooltip-container），所以用 :first-child 只命中端口名那条。 */
+.cbi-section div[style*="display:grid"]:has(> .ifacebox) > .ifacebox > .ifacebox-head:first-child {
+	background-color: var(--primary);
+	border-color: var(--primary);
+	color: var(--primary-foreground);
+}
 SHADCN_PATCH_PAYLOAD_EOF
 say "已写入  $THEME_MEDIA/patches/admin-status.css"
 
@@ -1286,6 +1315,106 @@ cat > "$THEME_MEDIA/patches/admin-network.css" <<'SHADCN_PATCH_PAYLOAD_EOF'
 SHADCN_PATCH_PAYLOAD_EOF
 say "已写入  $THEME_MEDIA/patches/admin-network.css"
 
+# ── PassWall 页补丁样式（运行状态卡片文字垂直居中，按页加载） ──
+#     -> $THEME_MEDIA/patches/admin-services-passwall.css
+cat > "$THEME_MEDIA/patches/admin-services-passwall.css" <<'SHADCN_PATCH_PAYLOAD_EOF'
+/*
+ * PATCH: admin-services-passwall (luci-app-passwall)
+ *
+ * PassWall 的「运行状态」卡片用 Pure CSS 网格排版：
+ *   .block.pure-g > .pure-u-1-3（图标 48px）+ .pure-u-2-3（h4：名称 + 状态）
+ * 两个格子等高拉伸，但 h4 的文字默认从格子顶部排起；不同版本的 passwall 给
+ * h4 的 min-height / 行高不一致，文字块比图标矮一截时就整体偏上，看起来"错位"。
+ *
+ * 这里让文字格子在卡片高度内垂直居中（h4 内的文字行同样居中），图标保持原样。
+ */
+.block .pure-u-2-3 { display: flex; align-items: center; }
+.block .pure-u-2-3 h4 { display: flex; flex-direction: column; justify-content: center; }
+.block .pure-u-2-3 h4 br { display: none; }
+
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 「运行状态」标题（<legend>）不再"骑"在卡片边框上
+ *
+ * fieldset > legend 的默认渲染是压在上边框（标题与边框线重叠，看起来像
+ * "掉进块里"）。用 float 让 legend 变回普通块级标题，边框保持完整；
+ * 后面的卡片容器清浮动。
+ * ──────────────────────────────────────────────────────────────────────── */
+#_passwall_status_fieldset > legend,
+fieldset.cbi-section > legend {
+	float: left;
+	width: 100%;
+	margin: 0 0 14px;
+	padding: 0;
+	line-height: 1.4;
+}
+
+#_passwall_status_fieldset > .pure-g.status,
+fieldset.cbi-section > .pure-g.status { clear: both; }
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/patches/admin-services-passwall.css"
+
+# ── 文件传输页补丁样式（按钮主色 / 浏览按钮块 / 窄屏自适应，按页加载） ──
+#     -> $THEME_MEDIA/patches/admin-system-filetransfer.css
+cat > "$THEME_MEDIA/patches/admin-system-filetransfer.css" <<'SHADCN_PATCH_PAYLOAD_EOF'
+/*
+ * PATCH: admin-system-filetransfer (luci-app-filetransfer)
+ *
+ * 这是旧式 LuCI 应用（Lua 模板），按钮用老 class `cbi-input-apply`：主题只定义了
+ * 新式 `cbi-button-apply` 等 variant，`cbi-input-apply` 会落到默认的次要色按钮（灰色）。
+ *
+ * 1) 上传 / 下载 / 安装 都是 cbi-input-apply —— 统一用主色；
+ * 2) 「浏览…」是原生 <input type=file> 的按钮部分 —— 用 ::file-selector-button
+ *    做成一个按钮块（次要色，与主色按钮区分）；
+ * 3) 旧模板给文件选择框内联 width:400px、label 内联 130px —— 窄屏下改成自适应，
+ *    否则会撑宽表单、把提交按钮挤出卡片。
+ */
+.cbi-button.cbi-input-apply {
+	background-color: var(--primary);
+	border-color: var(--primary);
+	color: var(--primary-foreground);
+}
+.cbi-button.cbi-input-apply:hover {
+	background-color: var(--primary-a90);
+	border-color: var(--primary-a90);
+}
+
+.cbi-input-file[type="file"]::file-selector-button {
+	margin-inline-end: 10.5px;
+	padding: 3.5px 10.5px;
+	border: 1px solid var(--border);
+	border-radius: var(--radius-base);
+	background-color: var(--label-surface);
+	color: var(--foreground);
+	font: inherit;
+	font-size: var(--text-sm);
+	cursor: pointer;
+	transition: background-color .2s;
+}
+.cbi-input-file[type="file"]::file-selector-button:hover {
+	background-color: var(--label-surface-a50);
+}
+
+@media (max-width: 767px) {
+	.cbi-input-file {
+		width: 100% !important;
+		max-width: 100%;
+		box-sizing: border-box;
+	}
+	label.cbi-value[style*="width"] {
+		display: block !important;
+		width: auto !important;
+		max-width: 100%;
+	}
+	.cbi-button.cbi-input-apply,
+	.cbi-button.cbi-input-remove {
+		max-width: 100%;
+		box-sizing: border-box;
+	}
+}
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/patches/admin-system-filetransfer.css"
+
 
 chmod 0644 "$THEME_DIR/header.ut" "$THEME_DIR/sysauth.ut" "$MODULE"
 
@@ -1298,8 +1427,10 @@ grep -q 'luci\.shadcn_config' "$THEME_DIR/sysauth.ut" \
 [ -s "$THEME_MEDIA/nav-topbar.css" ] || die "写入后校验失败：nav-topbar.css 为空"
 [ -s "$THEME_MEDIA/patches/admin-status.css" ] || die "写入后校验失败：patches/admin-status.css 为空"
 [ -s "$THEME_MEDIA/patches/admin-network.css" ] || die "写入后校验失败：patches/admin-network.css 为空"
+[ -s "$THEME_MEDIA/patches/admin-services-passwall.css" ] || die "写入后校验失败：patches/admin-services-passwall.css 为空"
+[ -s "$THEME_MEDIA/patches/admin-system-filetransfer.css" ] || die "写入后校验失败：patches/admin-system-filetransfer.css 为空"
 
-say "文件校验通过：6 个文件均已就位。"
+say "文件校验通过：8 个文件均已就位。"
 
 # ── 5. 编译自检（用系统自带的 ucode）────────────────────────────────────
 # 模板编译失败会让 LuCI 静默切换到别的主题（luci.runtime 的 trycompile），
@@ -1353,4 +1484,4 @@ say "  1) 浏览器强制刷新（Ctrl/Cmd+Shift+R）"
 say "  2) 打开 系统 -> Shadcn 主题：告警横幅应当消失，设置开始生效"
 say ""
 say "回滚：cp -p $BACKUP/header.ut $BACKUP/sysauth.ut $THEME_DIR/"
-say "      rm -f $MODULE $THEME_MEDIA/nav-topbar.css $THEME_MEDIA/patches/admin-status.css $THEME_MEDIA/patches/admin-network.css"
+say "      rm -f $MODULE $THEME_MEDIA/nav-topbar.css $THEME_MEDIA/patches/admin-status.css $THEME_MEDIA/patches/admin-network.css $THEME_MEDIA/patches/admin-services-passwall.css $THEME_MEDIA/patches/admin-system-filetransfer.css"

@@ -1,0 +1,33 @@
+/*
+ * PATCH: admin-services-passwall (luci-app-passwall)
+ *
+ * PassWall 的「运行状态」卡片用 Pure CSS 网格排版：
+ *   .block.pure-g > .pure-u-1-3（图标 48px）+ .pure-u-2-3（h4：名称 + 状态）
+ * 两个格子等高拉伸，但 h4 的文字默认从格子顶部排起；不同版本的 passwall 给
+ * h4 的 min-height / 行高不一致，文字块比图标矮一截时就整体偏上，看起来"错位"。
+ *
+ * 这里让文字格子在卡片高度内垂直居中（h4 内的文字行同样居中），图标保持原样。
+ */
+.block .pure-u-2-3 { display: flex; align-items: center; }
+.block .pure-u-2-3 h4 { display: flex; flex-direction: column; justify-content: center; }
+.block .pure-u-2-3 h4 br { display: none; }
+
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 「运行状态」标题（<legend>）不再"骑"在卡片边框上
+ *
+ * fieldset > legend 的默认渲染是压在上边框（标题与边框线重叠，看起来像
+ * "掉进块里"）。用 float 让 legend 变回普通块级标题，边框保持完整；
+ * 后面的卡片容器清浮动。
+ * ──────────────────────────────────────────────────────────────────────── */
+#_passwall_status_fieldset > legend,
+fieldset.cbi-section > legend {
+	float: left;
+	width: 100%;
+	margin: 0 0 14px;
+	padding: 0;
+	line-height: 1.4;
+}
+
+#_passwall_status_fieldset > .pure-g.status,
+fieldset.cbi-section > .pure-g.status { clear: both; }

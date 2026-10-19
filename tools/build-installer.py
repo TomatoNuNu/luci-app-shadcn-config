@@ -49,6 +49,16 @@ PAYLOADS = [
         "$THEME_MEDIA/patches/admin-network.css",
         "网络页补丁样式（接口卡片的图标比例，按页加载）",
     ),
+    (
+        "htdocs/luci-static/shadcn/patches/admin-services-passwall.css",
+        "$THEME_MEDIA/patches/admin-services-passwall.css",
+        "PassWall 页补丁样式（运行状态卡片文字垂直居中，按页加载）",
+    ),
+    (
+        "htdocs/luci-static/shadcn/patches/admin-system-filetransfer.css",
+        "$THEME_MEDIA/patches/admin-system-filetransfer.css",
+        "文件传输页补丁样式（按钮主色 / 浏览按钮块 / 窄屏自适应，按页加载）",
+    ),
 ]
 
 HEADER = r'''#!/bin/sh
@@ -57,7 +67,7 @@ HEADER = r'''#!/bin/sh
 # (install the shadcn-config integration patch onto an already installed theme)
 #
 # 与 luci-theme-shadcn-patch/0001-luci-app-shadcn-config-integration.patch 完全等价：
-# 路由器上没有 git/patch，所以这里直接替换那 6 个受影响的文件。
+# 路由器上没有 git/patch，所以这里直接替换那 8 个受影响的文件。
 #
 #   写入：
 #     /usr/share/ucode/luci/template/themes/shadcn/header.ut
@@ -66,6 +76,8 @@ HEADER = r'''#!/bin/sh
 #     /www/luci-static/shadcn/nav-topbar.css                （新增，顶栏布局样式）
 #     /www/luci-static/shadcn/patches/admin-status.css      （新增，状态页修复）
 #     /www/luci-static/shadcn/patches/admin-network.css     （新增，网络页卡片比例）
+#     /www/luci-static/shadcn/patches/admin-services-passwall.css（新增，PassWall 卡片对齐）
+#     /www/luci-static/shadcn/patches/admin-system-filetransfer.css（新增，文件传输页按钮）
 #
 #   原文件自动备份到 /root/shadcn-config-patch-backup/（重复运行不会覆盖首次备份）
 #
@@ -77,7 +89,7 @@ HEADER = r'''#!/bin/sh
 #   cp -p /root/shadcn-config-patch-backup/header.ut  /usr/share/ucode/luci/template/themes/shadcn/
 #   cp -p /root/shadcn-config-patch-backup/sysauth.ut /usr/share/ucode/luci/template/themes/shadcn/
 #   rm -f /usr/share/ucode/luci/shadcn_config.uc
-#   rm -f /www/luci-static/shadcn/nav-topbar.css /www/luci-static/shadcn/patches/admin-status.css /www/luci-static/shadcn/patches/admin-network.css
+#   rm -f /www/luci-static/shadcn/nav-topbar.css /www/luci-static/shadcn/patches/admin-status.css /www/luci-static/shadcn/patches/admin-network.css /www/luci-static/shadcn/patches/admin-services-passwall.css /www/luci-static/shadcn/patches/admin-system-filetransfer.css
 #   rm -f /tmp/luci-indexcache.*; rm -rf /tmp/luci-modulecache; /etc/init.d/rpcd reload
 #
 
@@ -162,8 +174,10 @@ grep -q 'luci\.shadcn_config' "$THEME_DIR/sysauth.ut" \
 [ -s "$THEME_MEDIA/nav-topbar.css" ] || die "写入后校验失败：nav-topbar.css 为空"
 [ -s "$THEME_MEDIA/patches/admin-status.css" ] || die "写入后校验失败：patches/admin-status.css 为空"
 [ -s "$THEME_MEDIA/patches/admin-network.css" ] || die "写入后校验失败：patches/admin-network.css 为空"
+[ -s "$THEME_MEDIA/patches/admin-services-passwall.css" ] || die "写入后校验失败：patches/admin-services-passwall.css 为空"
+[ -s "$THEME_MEDIA/patches/admin-system-filetransfer.css" ] || die "写入后校验失败：patches/admin-system-filetransfer.css 为空"
 
-say "文件校验通过：6 个文件均已就位。"
+say "文件校验通过：8 个文件均已就位。"
 
 # ── 5. 编译自检（用系统自带的 ucode）────────────────────────────────────
 # 模板编译失败会让 LuCI 静默切换到别的主题（luci.runtime 的 trycompile），
@@ -217,7 +231,7 @@ say "  1) 浏览器强制刷新（Ctrl/Cmd+Shift+R）"
 say "  2) 打开 系统 -> Shadcn 主题：告警横幅应当消失，设置开始生效"
 say ""
 say "回滚：cp -p $BACKUP/header.ut $BACKUP/sysauth.ut $THEME_DIR/"
-say "      rm -f $MODULE $THEME_MEDIA/nav-topbar.css $THEME_MEDIA/patches/admin-status.css $THEME_MEDIA/patches/admin-network.css"'''
+say "      rm -f $MODULE $THEME_MEDIA/nav-topbar.css $THEME_MEDIA/patches/admin-status.css $THEME_MEDIA/patches/admin-network.css $THEME_MEDIA/patches/admin-services-passwall.css $THEME_MEDIA/patches/admin-system-filetransfer.css"'''
 
 
 def embed(rel_src: str, dest: str, note: str) -> str:

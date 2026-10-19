@@ -61,3 +61,30 @@
 /* 图标：主图标 17.5px -> 26.25px；行内小图标 17.5px -> 21px（保持单行排布） */
 .ifacebox .ifacebox-body > img { width: 26.25px; }
 .ifacebox .ifacebox-body > span img { width: 21px; }
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 无线区块的强调色（与「网络」区块的 ifacebox-head.active 保持一致）
+ *
+ * 状态页里「网络」区块的卡片头在接口可用时带 .active（主题据此上主色），
+ * 而「无线」区块（60_wifi.js）的 ifacebox-head 只在 radio.isUp() 为真时
+ * 才带 .active —— 部分固件上该判定不返回真，卡片头就一直是灰白；
+ * 「已连接站点」的网络徽标也没有任何强调色。
+ *
+ * 这里按区块兜底：无线卡片头统一用主色（与网络卡片视觉一致）。
+ * 依赖 #wifi_assoclist_table（60_wifi.js 的固定 id）定位无线区块。
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.cbi-section:has(#wifi_assoclist_table) .network-status-table .ifacebox-head {
+	background-color: var(--primary);
+	border-color: var(--primary);
+	color: var(--primary-foreground);
+}
+
+/* 端口状态卡片：端口名标题条也用主色（与网络 / 无线卡片统一）。
+   端口卡片里有两个 .ifacebox-head：第一个是端口名，第二个是 zone 色条
+   （cbi-tooltip-container），所以用 :first-child 只命中端口名那条。 */
+.cbi-section div[style*="display:grid"]:has(> .ifacebox) > .ifacebox > .ifacebox-head:first-child {
+	background-color: var(--primary);
+	border-color: var(--primary);
+	color: var(--primary-foreground);
+}

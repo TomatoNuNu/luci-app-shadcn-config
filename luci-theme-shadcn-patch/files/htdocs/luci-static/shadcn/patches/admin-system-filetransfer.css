@@ -1,0 +1,55 @@
+/*
+ * PATCH: admin-system-filetransfer (luci-app-filetransfer)
+ *
+ * 这是旧式 LuCI 应用（Lua 模板），按钮用老 class `cbi-input-apply`：主题只定义了
+ * 新式 `cbi-button-apply` 等 variant，`cbi-input-apply` 会落到默认的次要色按钮（灰色）。
+ *
+ * 1) 上传 / 下载 / 安装 都是 cbi-input-apply —— 统一用主色；
+ * 2) 「浏览…」是原生 <input type=file> 的按钮部分 —— 用 ::file-selector-button
+ *    做成一个按钮块（次要色，与主色按钮区分）；
+ * 3) 旧模板给文件选择框内联 width:400px、label 内联 130px —— 窄屏下改成自适应，
+ *    否则会撑宽表单、把提交按钮挤出卡片。
+ */
+.cbi-button.cbi-input-apply {
+	background-color: var(--primary);
+	border-color: var(--primary);
+	color: var(--primary-foreground);
+}
+.cbi-button.cbi-input-apply:hover {
+	background-color: var(--primary-a90);
+	border-color: var(--primary-a90);
+}
+
+.cbi-input-file[type="file"]::file-selector-button {
+	margin-inline-end: 10.5px;
+	padding: 3.5px 10.5px;
+	border: 1px solid var(--border);
+	border-radius: var(--radius-base);
+	background-color: var(--label-surface);
+	color: var(--foreground);
+	font: inherit;
+	font-size: var(--text-sm);
+	cursor: pointer;
+	transition: background-color .2s;
+}
+.cbi-input-file[type="file"]::file-selector-button:hover {
+	background-color: var(--label-surface-a50);
+}
+
+@media (max-width: 767px) {
+	.cbi-input-file {
+		width: 100% !important;
+		max-width: 100%;
+		box-sizing: border-box;
+	}
+	label.cbi-value[style*="width"] {
+		display: block !important;
+		width: auto !important;
+		max-width: 100%;
+	}
+	.cbi-button.cbi-input-apply,
+	.cbi-button.cbi-input-remove {
+		max-width: 100%;
+		box-sizing: border-box;
+	}
+}

@@ -1,5 +1,7 @@
 # luci-theme-shadcn 设置功能（luci-app-shadcn-config）
 
+**简体中文** | [English](README.en.md)
+
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)
 
 给 [luci-theme-shadcn](https://github.com/eamonxg/luci-theme-shadcn) 主题加一个网页设置页，参考 [luci-theme-argon / luci-app-argon-config](https://github.com/jerrykuku/luci-app-argon-config) 的架构，打包成标准的 LuCI 应用（luci-app）。
@@ -21,7 +23,7 @@
 ```
 .
 ├── dist/                                          # ① 本地构建产物目录（不进版本库）；官方 ipk 见 Releases
-│   ├── luci-theme-shadcn_0.6.0-r20261013.7_all.ipk                     # 已打补丁的主题
+│   ├── luci-theme-shadcn_0.6.0-r20261013.14_all.ipk                    # 已打补丁的主题
 │   ├── luci-app-shadcn-config_1.0.8-r20261013_all.ipk                # 设置应用
 │   └── luci-i18n-shadcn-config-zh-cn_1.0.8-r20261013_all.ipk         # 中文翻译
 ├── luci-app-shadcn-config/                        # ② 设置应用源码（放进 OpenWrt 源码树/feed 即可编译）
@@ -98,10 +100,11 @@ git apply <本仓库>/luci-theme-shadcn-patch/0001-luci-app-shadcn-config-integr
 # 或者： patch -p1 < 0001-luci-app-shadcn-config-integration.patch
 ```
 
-补丁基于上游提交 `17c37b59ea244e7de89e4e3b3de3b85690ec9d04`（main 分支）生成，共改动/新增 7 个文件：
+补丁基于上游提交 `17c37b59ea244e7de89e4e3b3de3b85690ec9d04`（main 分支）生成，共改动/新增 9 个文件：
 
 - 改动 `ucode/template/themes/shadcn/header.ut` / `sysauth.ut`：读取配置、注入 token 与模式策略、登录页壁纸
-- 新增 `root/usr/share/ucode/luci/shadcn_config.uc`（主题侧读取/校验）、`htdocs/luci-static/shadcn/nav-topbar.css`（顶栏模式）、`htdocs/luci-static/shadcn/patches/admin-status.css` 与 `admin-network.css`（状态页 / 网络页的卡片比例调整）
+- 新增 `root/usr/share/ucode/luci/shadcn_config.uc`（主题侧读取/校验）、`htdocs/luci-static/shadcn/nav-topbar.css`（顶栏模式）
+- 新增四个按页补丁：`patches/admin-status.css`（状态页：窄屏布局、卡片比例、强调色）、`admin-network.css`（网络页卡片比例）、`admin-services-passwall.css`（PassWall 卡片对齐与标题）、`admin-system-filetransfer.css`（文件传输页按钮与窄屏自适应）
 - `Makefile`：版本号提升（避免被 feed 上的未打补丁版覆盖）
 
 不想用 git 的话，直接把 `luci-theme-shadcn-patch/files/` 里的文件覆盖到主题源码对应路径即可。
@@ -157,7 +160,7 @@ apk add --allow-untrusted luci-theme-shadcn-*.apk luci-app-shadcn-config-*.apk  
 到本仓库的 [Releases](../../releases) 页面下载这三个文件（`dist/` 只是本地构建输出的目录名，不进版本库）：
 
 ```
-luci-theme-shadcn_0.6.0-r20261013.7_all.ipk             # 已集成补丁的主题
+luci-theme-shadcn_0.6.0-r20261013.14_all.ipk            # 已集成补丁的主题
 luci-app-shadcn-config_1.0.8-r20261013_all.ipk          # 设置应用
 luci-i18n-shadcn-config-zh-cn_1.0.8-r20261013_all.ipk   # 中文翻译（可选）
 ```
@@ -165,7 +168,7 @@ luci-i18n-shadcn-config-zh-cn_1.0.8-r20261013_all.ipk   # 中文翻译（可选�
 拷到路由器后按顺序安装（**主题要先装，否则 app 的依赖检查会失败**）：
 
 ```sh
-opkg install ./luci-theme-shadcn_0.6.0-r20261013.7_all.ipk
+opkg install ./luci-theme-shadcn_0.6.0-r20261013.14_all.ipk
 opkg install ./luci-app-shadcn-config_1.0.8-r20261013_all.ipk
 opkg install ./luci-i18n-shadcn-config-zh-cn_1.0.8-r20261013_all.ipk   # 可选
 ```
@@ -176,7 +179,7 @@ OpenWrt 工具链打包；容器格式与官方包完全一致（`gzip(tar)` 内
 
 两点须知：
 
-- 主题包的版本是 `0.6.0-r20261013.7`，高于上游发布版的 `r20260920`，避免 `opkg upgrade` 时被 feed 上的  
+- 主题包的版本是 `0.6.0-r20261013.14`，高于上游发布版的 `r20260920`，避免 `opkg upgrade` 时被 feed 上的  
   未打补丁包覆盖；以后上游升级需要重新打补丁并重新打包。
 - 包里的 `.ut` 模板是**源码**（不是 25.12+ 新版 luci.mk 会生成的预编译字节码）。运行时会即时编译，  
   在 21.02 ~ 25.12 的所有 LuCI 上都能用，只是首次渲染时多几毫秒编译开销。
@@ -219,7 +222,7 @@ python3 tools/check-ipk.py dist/*.ipk        # 安装前离线自检（结构/�
 ## 参与
 
 - 遇到问题或有建议：欢迎开 [Issue](../../issues)。
-- 主题侧集成补丁的来龙去脉、三条"不能改的设计"（改了主题会失效），见  
+- 主题侧集成补丁的来龙去脉、几条"不能改的设计"（改了主题会失效），见  
   [`luci-theme-shadcn-patch/README.md`](luci-theme-shadcn-patch/README.md)。
 - 改完代码后重新打包与自检：`python3 tools/build-ipk.py --help`、`tools/verify/run.sh`。
 
