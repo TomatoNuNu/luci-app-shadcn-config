@@ -1351,6 +1351,109 @@ fieldset.cbi-section > legend {
 
 #_passwall_status_fieldset > .pure-g.status,
 fieldset.cbi-section > .pure-g.status { clear: both; }
+
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 节点列表（node_list.htm）：手机端布局修正
+ *
+ * PassWall 的节点列表给窄屏做了 flex 适配：checkbox 40px、备注 30%、
+ * Ping/TCPing/URL 各 50px、操作列 350px —— 手机上备注被压成窄条、三个
+ * 50px 的测试列内容溢出互相挤压，操作列又放不下 5 个按钮 + 拖拽手柄
+ * （手柄被挤出卡片）。
+ *
+ * 这里重排为三行：① checkbox + 备注（整行）② 三个测试列均分 ③ 按钮行
+ * （允许换行、手柄贴右）。顶部工具栏同时改用 flex（避免多行按钮上下重叠）。
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/* 顶部操作栏：inline-block 容器里的多行按钮容易上下重叠，改用 flex */
+.pw-toolbar-field {
+	display: flex !important;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	gap: 7px !important;
+}
+.pw-toolbar-field .cbi-button { margin: 0 !important; }
+
+@media (max-width: 767px) {
+	/* ① 复选框 + 备注占满第一行 */
+	.pw-checkbox { flex: 0 0 40px !important; }
+	.pw-remark {
+		flex: 1 1 calc(100% - 40px) !important;
+		min-width: 0;
+		text-align: left !important;
+	}
+
+	/* ② Ping / TCPing / URL Test 均分一行，内容不溢出 */
+	.pw-ping,
+	.pw-tcping,
+	.pw-urltest {
+		flex: 1 1 0 !important;
+		min-width: 0 !important;
+		white-space: normal !important;
+	}
+
+	/* ③ 操作行整行；min-width:0 是关键 —— 否则 td 会被按钮内容撑宽，
+	      按钮和拖拽手柄会被挤出卡片右侧 */
+	.pw-actions {
+		flex: 1 1 100% !important;
+		min-width: 0 !important;
+		max-width: 100% !important;
+		padding: 3.5px 0 !important;
+		text-align: left !important;
+	}
+	.node-wrapper {
+		display: flex !important;
+		width: 100% !important;
+		max-width: 100% !important;
+		flex-wrap: wrap !important;
+		gap: 5px !important;
+	}
+	.node-wrapper .drag-handle { flex: 0 0 auto; margin-inline-start: auto; }
+	.pw-actions .cbi-button { padding-inline: 7px !important; }
+}
+
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 节点下拉选择（nodes_listvalue / nodes_value 两套控件）
+ *
+ * 控件的「显示框」是 inline-flex 且没有宽度，内部 label 又是 width:100%
+ * 且 nowrap —— 两者互相依赖后按内容撑开，长节点名会把整个框顶出卡片右侧。
+ *
+ * 窄屏下让容器 / 显示框跟随卡片宽度，节点名超出部分用省略号，箭头固定贴右。
+ * ──────────────────────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+	.cbi-value-field { min-width: 0; }
+
+	.lv-dropdown-container,
+	.v-dropdown-container {
+		display: block !important;
+		width: 100% !important;
+		max-width: 100% !important;
+		white-space: normal !important;
+		box-sizing: border-box;
+	}
+
+	.lv-dropdown-display,
+	.v-dropdown-display {
+		display: flex !important;
+		width: 100% !important;
+		max-width: 100% !important;
+		box-sizing: border-box;
+	}
+
+	.lv-dropdown-label,
+	.v-dropdown-label {
+		flex: 1 1 auto !important;
+		width: auto !important;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.lv-arrow-down,
+	.v-arrow-down { flex: 0 0 auto; }
+}
 SHADCN_PATCH_PAYLOAD_EOF
 say "已写入  $THEME_MEDIA/patches/admin-services-passwall.css"
 

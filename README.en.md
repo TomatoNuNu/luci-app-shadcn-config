@@ -23,7 +23,7 @@ What you can configure:
 ```
 .
 ├── dist/                                          # local build output (not in version control); official ipk files are on Releases
-│   ├── luci-theme-shadcn_0.6.0-r20261013.14_all.ipk                    # patched theme
+│   ├── luci-theme-shadcn_0.6.0-r20261013.17_all.ipk                    # patched theme
 │   ├── luci-app-shadcn-config_1.0.8-r20261013_all.ipk                # settings app
 │   └── luci-i18n-shadcn-config-zh-cn_1.0.8-r20261013_all.ipk         # Chinese translation
 ├── luci-app-shadcn-config/                        # app sources (drop into an OpenWrt tree/feed and build)
@@ -151,7 +151,7 @@ Then open **System → Shadcn Theme** (`/cgi-bin/luci/admin/system/shadcn-config
 Download the three files from this repository's [Releases](../../releases) page (`dist/` is only the local build output directory and is not in version control):
 
 ```
-luci-theme-shadcn_0.6.0-r20261013.14_all.ipk            # theme with the integration built in
+luci-theme-shadcn_0.6.0-r20261013.17_all.ipk            # theme with the integration built in
 luci-app-shadcn-config_1.0.8-r20261013_all.ipk          # settings app
 luci-i18n-shadcn-config-zh-cn_1.0.8-r20261013_all.ipk   # Chinese translation (optional)
 ```
@@ -159,7 +159,7 @@ luci-i18n-shadcn-config-zh-cn_1.0.8-r20261013_all.ipk   # Chinese translation (o
 Then install them on the router **in this order** (the theme must come first, otherwise the app's dependency check fails):
 
 ```sh
-opkg install ./luci-theme-shadcn_0.6.0-r20261013.14_all.ipk
+opkg install ./luci-theme-shadcn_0.6.0-r20261013.17_all.ipk
 opkg install ./luci-app-shadcn-config_1.0.8-r20261013_all.ipk
 opkg install ./luci-i18n-shadcn-config-zh-cn_1.0.8-r20261013_all.ipk   # optional
 ```
@@ -168,7 +168,7 @@ These are pure `LUCI_PKGARCH=all` file packages (scripts, templates, front-end a
 
 Two things to know:
 
-- The theme package is versioned `0.6.0-r20261013.14`, above the upstream release `r20260920`, so `opkg upgrade` will not overwrite it with the unpatched feed build; after an upstream release you need to re-apply the patch and rebuild.
+- The theme package is versioned `0.6.0-r20261013.17`, above the upstream release `r20260920`, so `opkg upgrade` will not overwrite it with the unpatched feed build; after an upstream release you need to re-apply the patch and rebuild.
 - The `.ut` templates inside the package are **sources** (not the precompiled bytecode the newer 25.12+ luci.mk produces). They are compiled on the fly, which works on every LuCI from 21.02 to 25.12, at the cost of a few extra milliseconds on the first render.
 
 To rebuild after changing the code:

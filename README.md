@@ -23,7 +23,7 @@
 ```
 .
 ├── dist/                                          # ① 本地构建产物目录（不进版本库）；官方 ipk 见 Releases
-│   ├── luci-theme-shadcn_0.6.0-r20261013.14_all.ipk                    # 已打补丁的主题
+│   ├── luci-theme-shadcn_0.6.0-r20261013.17_all.ipk                    # 已打补丁的主题
 │   ├── luci-app-shadcn-config_1.0.8-r20261013_all.ipk                # 设置应用
 │   └── luci-i18n-shadcn-config-zh-cn_1.0.8-r20261013_all.ipk         # 中文翻译
 ├── luci-app-shadcn-config/                        # ② 设置应用源码（放进 OpenWrt 源码树/feed 即可编译）
@@ -160,7 +160,7 @@ apk add --allow-untrusted luci-theme-shadcn-*.apk luci-app-shadcn-config-*.apk  
 到本仓库的 [Releases](../../releases) 页面下载这三个文件（`dist/` 只是本地构建输出的目录名，不进版本库）：
 
 ```
-luci-theme-shadcn_0.6.0-r20261013.14_all.ipk            # 已集成补丁的主题
+luci-theme-shadcn_0.6.0-r20261013.17_all.ipk            # 已集成补丁的主题
 luci-app-shadcn-config_1.0.8-r20261013_all.ipk          # 设置应用
 luci-i18n-shadcn-config-zh-cn_1.0.8-r20261013_all.ipk   # 中文翻译（可选）
 ```
@@ -168,7 +168,7 @@ luci-i18n-shadcn-config-zh-cn_1.0.8-r20261013_all.ipk   # 中文翻译（可选�
 拷到路由器后按顺序安装（**主题要先装，否则 app 的依赖检查会失败**）：
 
 ```sh
-opkg install ./luci-theme-shadcn_0.6.0-r20261013.14_all.ipk
+opkg install ./luci-theme-shadcn_0.6.0-r20261013.17_all.ipk
 opkg install ./luci-app-shadcn-config_1.0.8-r20261013_all.ipk
 opkg install ./luci-i18n-shadcn-config-zh-cn_1.0.8-r20261013_all.ipk   # 可选
 ```
@@ -179,7 +179,7 @@ OpenWrt 工具链打包；容器格式与官方包完全一致（`gzip(tar)` 内
 
 两点须知：
 
-- 主题包的版本是 `0.6.0-r20261013.14`，高于上游发布版的 `r20260920`，避免 `opkg upgrade` 时被 feed 上的  
+- 主题包的版本是 `0.6.0-r20261013.17`，高于上游发布版的 `r20260920`，避免 `opkg upgrade` 时被 feed 上的  
   未打补丁包覆盖；以后上游升级需要重新打补丁并重新打包。
 - 包里的 `.ut` 模板是**源码**（不是 25.12+ 新版 luci.mk 会生成的预编译字节码）。运行时会即时编译，  
   在 21.02 ~ 25.12 的所有 LuCI 上都能用，只是首次渲染时多几毫秒编译开销。

@@ -45,7 +45,7 @@ APP_URL = "https://github.com/eamonxg/luci-theme-shadcn"
 
 THEME_NAME = "luci-theme-shadcn"
 THEME_VERSION = "0.6.0"
-THEME_RELEASE = "20261013.14"
+THEME_RELEASE = "20261013.17"
 THEME_DESCRIPTION = (
     "A modern sidebar LuCI theme for OpenWrt, built with shadcn/ui design "
     "language (with luci-app-shadcn-config integration)."
