@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index d36e06c..d03cf6b 100644
+index d36e06c..25ba03f 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -9,7 +9,9 @@ LUCI_TITLE:=A modern sidebar LuCI theme for OpenWrt, built with shadcn/ui design
@@ -9,7 +9,7 @@ index d36e06c..d03cf6b 100644
 -PKG_RELEASE:=20260920
 +# Bumped by the luci-app-shadcn-config integration patch so that packages built
 +# from this tree sort above the unpatched upstream release of the same version.
-+PKG_RELEASE:=20261013.17
++PKG_RELEASE:=20261013.19
  PKG_LICENSE:=Apache-2.0
  
  LUCI_MINIFY_CSS:=
@@ -382,10 +382,10 @@ index 0000000..45401e9
 +}
 diff --git a/htdocs/luci-static/shadcn/patches/admin-status.css b/htdocs/luci-static/shadcn/patches/admin-status.css
 new file mode 100644
-index 0000000..577fcec
+index 0000000..f82f841
 --- /dev/null
 +++ b/htdocs/luci-static/shadcn/patches/admin-status.css
-@@ -0,0 +1,90 @@
+@@ -0,0 +1,112 @@
 +/*
 + * Port status cards on narrow screens.
 + *
@@ -476,6 +476,28 @@ index 0000000..577fcec
 +	border-color: var(--primary);
 +	color: var(--primary-foreground);
 +}
++
++
++/* ────────────────────────────────────────────────────────────────────────
++ * 已连接站点：网络徽标（ifacebadge）的长文本在框内换行
++ *
++ * 主题的 .ifacebadge 是 inline-flex + nowrap，内容按需撑宽；长 SSID
++ * （如「接入点 AP "肥猫快餐" (wifi0.network1)」）会把徽标顶出所在格子，
++ * 压到右侧「MAC 地址」列上。这里让徽标不超过格子宽度，并允许文字换行。
++ * ──────────────────────────────────────────────────────────────────────── */
++#wifi_assoclist_table .td { min-width: 0; }
++
++#wifi_assoclist_table .ifacebadge {
++	max-width: 100%;
++	min-width: 0;
++}
++
++#wifi_assoclist_table .ifacebadge > span {
++	min-width: 0;
++	white-space: normal;
++	overflow-wrap: anywhere;
++	line-height: 1.4;
++}
 diff --git a/htdocs/luci-static/shadcn/patches/admin-system-filetransfer.css b/htdocs/luci-static/shadcn/patches/admin-system-filetransfer.css
 new file mode 100644
 index 0000000..8b44ff5
@@ -536,6 +558,37 @@ index 0000000..8b44ff5
 +		max-width: 100%;
 +		box-sizing: border-box;
 +	}
++}
+diff --git a/htdocs/luci-static/shadcn/patches/admin.css b/htdocs/luci-static/shadcn/patches/admin.css
+new file mode 100644
+index 0000000..b7e59b8
+--- /dev/null
++++ b/htdocs/luci-static/shadcn/patches/admin.css
+@@ -0,0 +1,25 @@
++/*
++ * 可读性调整（参考 luci-theme-argon 的字号与行高）
++ *
++ * shadcn 在 html 上把字号设成 --text-sm（0.875rem → 14px），后代所有 rem
++ * 随之以 14px 为基准 —— 正文 --text-sm 实际只有 12.25px，比 argon 的正文
++ * （14px）小约 12%；行高也偏紧（约 17.5px，argon 约 20px）。
++ *
++ * 这里只放大文字（正文回到 14px、行高 1.5），不改 --spacing 等 rem 基准，
++ * 避免卡片 / 按钮 / 间距等整套布局被一起放大。
++ */
++html {
++	font-size: 16px;              /* 基准 16px：后代 --text-sm = 14px（与 argon 一致） */
++}
++
++body {
++	line-height: 1.5;             /* 原 1.43 */
++}
++
++/* 表格行多一点纵向留白，接近 argon 的疏朗感 */
++.table td,
++.table .td,
++.table th,
++.table .th {
++	padding-block: calc(var(--spacing) * 3);
 +}
 diff --git a/root/usr/share/ucode/luci/shadcn_config.uc b/root/usr/share/ucode/luci/shadcn_config.uc
 new file mode 100644

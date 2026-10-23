@@ -4,7 +4,7 @@
 # (install the shadcn-config integration patch onto an already installed theme)
 #
 # 与 luci-theme-shadcn-patch/0001-luci-app-shadcn-config-integration.patch 完全等价：
-# 路由器上没有 git/patch，所以这里直接替换那 8 个受影响的文件。
+# 路由器上没有 git/patch，所以这里直接替换那 9 个受影响的文件。
 #
 #   写入：
 #     /usr/share/ucode/luci/template/themes/shadcn/header.ut
@@ -15,6 +15,7 @@
 #     /www/luci-static/shadcn/patches/admin-network.css     （新增，网络页卡片比例）
 #     /www/luci-static/shadcn/patches/admin-services-passwall.css（新增，PassWall 卡片对齐）
 #     /www/luci-static/shadcn/patches/admin-system-filetransfer.css（新增，文件传输页按钮）
+#     /www/luci-static/shadcn/patches/admin.css（新增，全局可读性/字号行高）
 #
 #   原文件自动备份到 /root/shadcn-config-patch-backup/（重复运行不会覆盖首次备份）
 #
@@ -26,7 +27,7 @@
 #   cp -p /root/shadcn-config-patch-backup/header.ut  /usr/share/ucode/luci/template/themes/shadcn/
 #   cp -p /root/shadcn-config-patch-backup/sysauth.ut /usr/share/ucode/luci/template/themes/shadcn/
 #   rm -f /usr/share/ucode/luci/shadcn_config.uc
-#   rm -f /www/luci-static/shadcn/nav-topbar.css /www/luci-static/shadcn/patches/admin-status.css /www/luci-static/shadcn/patches/admin-network.css /www/luci-static/shadcn/patches/admin-services-passwall.css /www/luci-static/shadcn/patches/admin-system-filetransfer.css
+#   rm -f /www/luci-static/shadcn/nav-topbar.css /www/luci-static/shadcn/patches/admin-status.css /www/luci-static/shadcn/patches/admin-network.css /www/luci-static/shadcn/patches/admin-services-passwall.css /www/luci-static/shadcn/patches/admin-system-filetransfer.css /www/luci-static/shadcn/patches/admin.css
 #   rm -f /tmp/luci-indexcache.*; rm -rf /tmp/luci-modulecache; /etc/init.d/rpcd reload
 #
 
@@ -1264,6 +1265,28 @@ cat > "$THEME_MEDIA/patches/admin-status.css" <<'SHADCN_PATCH_PAYLOAD_EOF'
 	border-color: var(--primary);
 	color: var(--primary-foreground);
 }
+
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 已连接站点：网络徽标（ifacebadge）的长文本在框内换行
+ *
+ * 主题的 .ifacebadge 是 inline-flex + nowrap，内容按需撑宽；长 SSID
+ * （如「接入点 AP "肥猫快餐" (wifi0.network1)」）会把徽标顶出所在格子，
+ * 压到右侧「MAC 地址」列上。这里让徽标不超过格子宽度，并允许文字换行。
+ * ──────────────────────────────────────────────────────────────────────── */
+#wifi_assoclist_table .td { min-width: 0; }
+
+#wifi_assoclist_table .ifacebadge {
+	max-width: 100%;
+	min-width: 0;
+}
+
+#wifi_assoclist_table .ifacebadge > span {
+	min-width: 0;
+	white-space: normal;
+	overflow-wrap: anywhere;
+	line-height: 1.4;
+}
 SHADCN_PATCH_PAYLOAD_EOF
 say "已写入  $THEME_MEDIA/patches/admin-status.css"
 
@@ -1518,6 +1541,37 @@ cat > "$THEME_MEDIA/patches/admin-system-filetransfer.css" <<'SHADCN_PATCH_PAYLO
 SHADCN_PATCH_PAYLOAD_EOF
 say "已写入  $THEME_MEDIA/patches/admin-system-filetransfer.css"
 
+# ── 全局补丁样式（可读性：正文字号与行高，所有页面加载） ──
+#     -> $THEME_MEDIA/patches/admin.css
+cat > "$THEME_MEDIA/patches/admin.css" <<'SHADCN_PATCH_PAYLOAD_EOF'
+/*
+ * 可读性调整（参考 luci-theme-argon 的字号与行高）
+ *
+ * shadcn 在 html 上把字号设成 --text-sm（0.875rem → 14px），后代所有 rem
+ * 随之以 14px 为基准 —— 正文 --text-sm 实际只有 12.25px，比 argon 的正文
+ * （14px）小约 12%；行高也偏紧（约 17.5px，argon 约 20px）。
+ *
+ * 这里只放大文字（正文回到 14px、行高 1.5），不改 --spacing 等 rem 基准，
+ * 避免卡片 / 按钮 / 间距等整套布局被一起放大。
+ */
+html {
+	font-size: 16px;              /* 基准 16px：后代 --text-sm = 14px（与 argon 一致） */
+}
+
+body {
+	line-height: 1.5;             /* 原 1.43 */
+}
+
+/* 表格行多一点纵向留白，接近 argon 的疏朗感 */
+.table td,
+.table .td,
+.table th,
+.table .th {
+	padding-block: calc(var(--spacing) * 3);
+}
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/patches/admin.css"
+
 
 chmod 0644 "$THEME_DIR/header.ut" "$THEME_DIR/sysauth.ut" "$MODULE"
 
@@ -1532,8 +1586,9 @@ grep -q 'luci\.shadcn_config' "$THEME_DIR/sysauth.ut" \
 [ -s "$THEME_MEDIA/patches/admin-network.css" ] || die "写入后校验失败：patches/admin-network.css 为空"
 [ -s "$THEME_MEDIA/patches/admin-services-passwall.css" ] || die "写入后校验失败：patches/admin-services-passwall.css 为空"
 [ -s "$THEME_MEDIA/patches/admin-system-filetransfer.css" ] || die "写入后校验失败：patches/admin-system-filetransfer.css 为空"
+[ -s "$THEME_MEDIA/patches/admin.css" ] || die "写入后校验失败：patches/admin.css 为空"
 
-say "文件校验通过：8 个文件均已就位。"
+say "文件校验通过：9 个文件均已就位。"
 
 # ── 5. 编译自检（用系统自带的 ucode）────────────────────────────────────
 # 模板编译失败会让 LuCI 静默切换到别的主题（luci.runtime 的 trycompile），
@@ -1587,4 +1642,4 @@ say "  1) 浏览器强制刷新（Ctrl/Cmd+Shift+R）"
 say "  2) 打开 系统 -> Shadcn 主题：告警横幅应当消失，设置开始生效"
 say ""
 say "回滚：cp -p $BACKUP/header.ut $BACKUP/sysauth.ut $THEME_DIR/"
-say "      rm -f $MODULE $THEME_MEDIA/nav-topbar.css $THEME_MEDIA/patches/admin-status.css $THEME_MEDIA/patches/admin-network.css $THEME_MEDIA/patches/admin-services-passwall.css $THEME_MEDIA/patches/admin-system-filetransfer.css"
+say "      rm -f $MODULE $THEME_MEDIA/nav-topbar.css $THEME_MEDIA/patches/admin-status.css $THEME_MEDIA/patches/admin-network.css $THEME_MEDIA/patches/admin-services-passwall.css $THEME_MEDIA/patches/admin-system-filetransfer.css $THEME_MEDIA/patches/admin.css"
