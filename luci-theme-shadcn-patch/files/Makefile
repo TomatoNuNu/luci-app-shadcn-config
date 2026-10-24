@@ -11,7 +11,7 @@ LUCI_DEPENDS:=+luci-base
 PKG_VERSION:=0.6.0
 # Bumped by the luci-app-shadcn-config integration patch so that packages built
 # from this tree sort above the unpatched upstream release of the same version.
-PKG_RELEASE:=20261024.1
+PKG_RELEASE:=20261024.2
 PKG_LICENSE:=Apache-2.0
 
 LUCI_MINIFY_CSS:=

@@ -70,6 +70,11 @@ PAYLOADS = [
         "页面密度（紧凑 / 普通 / 宽松）",
     ),
     (
+        "htdocs/luci-static/shadcn/topbar-touch.js",
+        "$THEME_MEDIA/topbar-touch.js",
+        "顶栏触屏点击切换脚本",
+    ),
+    (
         "htdocs/luci-static/shadcn/responsive.css",
         "$THEME_MEDIA/responsive.css",
         "响应式兜底（任意宽度不横向溢出）",
@@ -227,7 +232,7 @@ HEADER = r'''#!/bin/sh
 # (install the shadcn-config integration patch onto an already installed theme)
 #
 # 与 luci-theme-shadcn-patch/0001-luci-app-shadcn-config-integration.patch 完全等价：
-# 路由器上没有 git/patch，所以这里直接替换那 37 个受影响的文件。
+# 路由器上没有 git/patch，所以这里直接替换那 38 个受影响的文件。
 #
 #   写入：
 #     /usr/share/ucode/luci/template/themes/shadcn/header.ut
@@ -340,7 +345,7 @@ grep -q 'luci\.shadcn_config' "$THEME_DIR/sysauth.ut" \
 [ -s "$THEME_MEDIA/patches/admin-system-filetransfer.css" ] || die "写入后校验失败：patches/admin-system-filetransfer.css 为空"
 [ -s "$THEME_MEDIA/patches/admin.css" ] || die "写入后校验失败：patches/admin.css 为空"
 
-say "文件校验通过：37 个文件均已就位。"
+say "文件校验通过：38 个文件均已就位。"
 
 # ── 5. 编译自检（用系统自带的 ucode）────────────────────────────────────
 # 模板编译失败会让 LuCI 静默切换到别的主题（luci.runtime 的 trycompile），

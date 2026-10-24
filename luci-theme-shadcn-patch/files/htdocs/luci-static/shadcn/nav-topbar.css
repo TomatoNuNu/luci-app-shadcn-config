@@ -169,3 +169,30 @@
 		padding: .5rem;
 	}
 }
+
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 顶栏下拉：触屏用 JS 维护的 data-tap-open 控制
+ *
+ * topbar-touch.js 在 (hover: none) 的设备上接管点击，写入 data-tap-open。
+ * 这里让触屏忽略 :hover（否则点完手指抬起菜单就没了），改用该属性。
+ * ──────────────────────────────────────────────────────────────────────── */
+@media (hover: none) {
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-item:hover > .sidebar-accordion-sub {
+		visibility: hidden;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-item[data-tap-open="true"] > .sidebar-accordion-sub {
+		visibility: visible;
+		opacity: 1;
+		pointer-events: auto;
+		transform: translateY(0);
+	}
+
+	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-item[data-tap-open="true"] > .sidebar-nav-parent {
+		background-color: var(--sidebar-accent);
+		color: var(--sidebar-accent-fg);
+	}
+}

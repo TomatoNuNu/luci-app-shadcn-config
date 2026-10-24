@@ -136,6 +136,8 @@
 		{# luci-app-shadcn-config: optional redrawn icon set -#}
 		<link rel="stylesheet" href="{{ media }}/icons.css" data-luci-shell>
 		{% endif %}
+		{# luci-app-shadcn-config: touch tap-to-toggle for the top bar -#}
+		<script defer src="{{ media }}/topbar-touch.js" data-luci-shell></script>
 		{# luci-app-shadcn-config: page density (compact / normal / large) -#}
 		<link rel="stylesheet" href="{{ media }}/density.css" data-luci-shell>
 		{% for (let patch in patch_files): %}
