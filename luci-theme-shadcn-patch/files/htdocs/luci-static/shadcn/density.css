@@ -1,0 +1,70 @@
+/*
+ * 页面密度（compact / normal / large）
+ *
+ * 三档的定位：
+ *   compact —— 更紧的字号与留白，一屏显示更多内容
+ *   normal  —— 主题默认观感
+ *   large   —— 宽松档，比默认再放大约 8%~22%
+ *
+ * 实现：三个乘数分别控制文字、间距、盒子（控件/侧栏），再换算成主题 token。
+ */
+
+html {
+	--dens-type: 1;
+	--dens-space: 1;
+	--dens-box: 1;
+}
+
+/* 紧凑：更小的字号和更紧的留白，一屏显示更多内容 */
+html[data-shadcn-density="compact"] {
+	--dens-type: .92;	/* 14px -> ~12.9px */
+	--dens-space: .78;	/* 卡片内边距 / 行距收紧 */
+	--dens-box: .9;		/* 控件高度 / 侧栏宽度略收 */
+}
+
+/* 正常：主题默认观感 */
+html[data-shadcn-density="normal"] {
+	--dens-type: 1;
+	--dens-space: 1;
+	--dens-box: 1;
+}
+
+/* 宽松：保持原设定 */
+html[data-shadcn-density="large"] {
+	--dens-type: 1.08;
+	--dens-space: 1.22;
+	--dens-box: 1.12;
+}
+
+/* ── 换算到主题 token ─────────────────────────────────────────────── */
+
+/* 间距体系：主题所有 padding/margin/gap 都基于 --spacing（0.25rem 的倍数） */
+html {
+	--spacing: calc(.25rem * var(--dens-space));
+}
+
+/* 字号：正文与标题 */
+html {
+	--text-xs: calc(.75rem * var(--dens-type));
+	--text-sm: calc(.875rem * var(--dens-type));
+	--text-base: calc(1rem * var(--dens-type));
+	--text-lg: calc(1.125rem * var(--dens-type));
+	--text-xl: calc(1.25rem * var(--dens-type));
+	--text-2xl: calc(1.5rem * var(--dens-type));
+}
+
+/* 控件高度：按钮 / 输入框 / 下拉框 */
+html[data-shadcn-density] .cbi-button,
+html[data-shadcn-density] input.cbi-input-text,
+html[data-shadcn-density] select.cbi-input-select {
+	padding-block: calc(var(--spacing) * calc(1.5 * var(--dens-box)));
+}
+
+/* 表格行密度 */
+html[data-shadcn-density] .table .td,
+html[data-shadcn-density] .table .th {
+	padding-block: calc(var(--spacing) * calc(2.5 * var(--dens-box)));
+}
+
+/* 侧边栏宽度 */
+html[data-shadcn-density] #sidebar { --sidebar-width: calc(16rem * var(--dens-box)); }

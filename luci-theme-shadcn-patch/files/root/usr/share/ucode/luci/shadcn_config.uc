@@ -191,6 +191,8 @@ function load() {
 		login_bg: 'default',
 		login_bg_url: null,
 		nav: 'sidebar',		/* sidebar | topbar */
+		icons: 'default',	/* default | redesign */
+		density: 'normal',	/* compact | normal | large */
 		logo: null,		/* file name inside BRAND_DIR */
 		favicon: null
 	};
@@ -250,6 +252,16 @@ function load() {
 
 	if (nav == 'topbar' || nav == 'sidebar')
 		cfg.nav = nav;
+
+	const icons = read('icons');
+
+	if (icons == 'default' || icons == 'redesign')
+		cfg.icons = icons;
+
+	const density = read('density');
+
+	if (density == 'compact' || density == 'normal' || density == 'large')
+		cfg.density = density;
 
 	const logo = read('logo');
 

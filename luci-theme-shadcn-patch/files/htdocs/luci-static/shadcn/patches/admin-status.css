@@ -88,25 +88,3 @@
 	border-color: var(--primary);
 	color: var(--primary-foreground);
 }
-
-
-/* ────────────────────────────────────────────────────────────────────────
- * 已连接站点：网络徽标（ifacebadge）的长文本在框内换行
- *
- * 主题的 .ifacebadge 是 inline-flex + nowrap，内容按需撑宽；长 SSID
- * （如「接入点 AP "肥猫快餐" (wifi0.network1)」）会把徽标顶出所在格子，
- * 压到右侧「MAC 地址」列上。这里让徽标不超过格子宽度，并允许文字换行。
- * ──────────────────────────────────────────────────────────────────────── */
-#wifi_assoclist_table .td { min-width: 0; }
-
-#wifi_assoclist_table .ifacebadge {
-	max-width: 100%;
-	min-width: 0;
-}
-
-#wifi_assoclist_table .ifacebadge > span {
-	min-width: 0;
-	white-space: normal;
-	overflow-wrap: anywhere;
-	line-height: 1.4;
-}

@@ -1,0 +1,129 @@
+/*
+ * 响应式兜底（保持克制：只做"不横向溢出"和"长串可断行"）
+ *
+ * 主题本身已有窄屏布局（表格在手机上变成两列卡片、侧边栏收成抽屉），
+ * 这里不再干预表格的行列结构，只做两件事：
+ *   1. 页面级禁止横向溢出，主容器不超出视口；
+ *   2. 长串（IPv6、SSID、主机名等）允许在容器内断行，不撑破卡片。
+ */
+
+/* ── 1. 页面级防溢出 ─────────────────────────────────────────────── */
+html,
+body {
+	max-width: 100%;
+	overflow-x: hidden;
+}
+
+#main-wrapper,
+#maincontent,
+.content-card,
+.cbi-map,
+.cbi-section,
+.cbi-section-node,
+.cbi-value,
+.cbi-value-field,
+.ifacebox,
+.table {
+	max-width: 100%;
+	box-sizing: border-box;
+}
+
+/* flex/grid 子项允许收缩（否则内容会把容器顶宽） */
+.cbi-value > *,
+.cbi-value-field > *,
+.ifacebox-body > * {
+	min-width: 0;
+}
+
+/* ── 2. 长串断行 ─────────────────────────────────────────────────── */
+.cbi-value-field,
+.cbi-value-title,
+.cbi-section-descr,
+.table .td,
+.table .th,
+.ifacebadge,
+.ifacebadge > span,
+p,
+li,
+code {
+	overflow-wrap: anywhere;
+	word-break: break-word;
+}
+
+/* ── 3. 弹窗：窄屏只调宽度，不动 display ─────────────────────────
+ * 注意：绝不要给 #modal_overlay 设 display —— 主题用 `display:none` 隐藏遮罩、
+ * 用 `.modal-overlay-active` 显示；覆盖 display 会导致弹窗关不掉。
+ */
+@media (max-width: 767px) {
+	#modal_overlay {
+		padding: calc(var(--spacing) * 2);
+	}
+
+	#modal_overlay > .modal {
+		width: auto;
+		max-width: 100%;
+		min-width: 0;
+		margin: 0 auto;
+		box-sizing: border-box;
+	}
+}
+
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 底部操作栏：所有按钮统一高度
+ *
+ * 「保存并应用」是 split button（主按钮 + 下拉箭头），内部结构比普通按钮高；
+ * 而 #maincontent .cbi-page-actions 用的是 align-items: center，各按钮按自身
+ * 高度居中，于是这一组看起来参差不齐。这里给整组统一高度。
+ * ──────────────────────────────────────────────────────────────────────── */
+#maincontent .cbi-page-actions {
+	align-items: stretch;
+}
+
+#maincontent .cbi-page-actions > .cbi-button,
+#maincontent .cbi-page-actions > .btn,
+#maincontent .cbi-page-actions > button,
+#maincontent .cbi-page-actions > div > .cbi-button,
+#maincontent .cbi-page-actions > div > .btn {
+	min-height: calc(var(--spacing) * 10);
+	height: calc(var(--spacing) * 10);
+	box-sizing: border-box;
+	align-items: center;
+}
+
+/* split button 的两个部分都要撑满这一组的高度 */
+#maincontent .cbi-page-actions .cbi-button-group,
+#maincontent .cbi-page-actions .btn-group {
+	display: flex;
+	align-items: stretch;
+	height: calc(var(--spacing) * 10);
+}
+
+#maincontent .cbi-page-actions .cbi-button-group > *,
+#maincontent .cbi-page-actions .btn-group > * {
+	height: 100%;
+	box-sizing: border-box;
+}
+
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 端口 / 接口卡片：标题条圆角与外框对齐
+ *
+ * .ifacebox 有 1px 边框，标题条圆角用的是同一个 --radius-base —— 边框占掉
+ * 1px 后两者弧线错开，四个角会露出背景色。把标题条圆角扣掉边框宽度即可贴合。
+ * ──────────────────────────────────────────────────────────────────────── */
+.ifacebox > .ifacebox-head {
+	border-top-left-radius: calc(var(--radius-base) - 1px) !important;
+	border-top-right-radius: calc(var(--radius-base) - 1px) !important;
+}
+
+.ifacebox > .ifacebox-body {
+	border-bottom-right-radius: calc(var(--radius-base) - 1px) !important;
+	border-bottom-left-radius: calc(var(--radius-base) - 1px) !important;
+}
+
+/* 无边框的卡片（用 box-shadow 的那类）保持原圆角 */
+.ifacebox[style*="border: none"] > .ifacebox-head {
+	border-top-left-radius: var(--radius-base) !important;
+	border-top-right-radius: var(--radius-base) !important;
+}

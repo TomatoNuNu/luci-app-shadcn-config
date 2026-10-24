@@ -441,7 +441,7 @@ return view.extend({
 		   the page "poisoned", which downgrades the whole UI to full page
 		   loads. */
 
-		const m = new form.Map('shadcn', _('Shadcn theme'),
+		const m = new form.Map('shadcn', _('Shadcn theme settings'),
 			_('Settings for the <code>luci-theme-shadcn</code> theme. They are applied by the theme itself, so newly loaded pages and the login page pick them up immediately after saving.'));
 
 		let s, o;
@@ -467,7 +467,7 @@ return view.extend({
 
 		/* ── Day/night mode ──────────────────────────────────────────── */
 		s = m.section(form.TypedSection, 'global', _('Day/night mode'),
-			_('The default colour scheme of the theme, and whether visitors may override it.'));
+			_('The default colour scheme of the theme.'));
 		s.anonymous = true;
 		s.addremove = false;
 
@@ -501,14 +501,14 @@ return view.extend({
 		o.fallbackColor = THEME_DEFAULT_BRAND;
 		o.validate = validateHexColor;
 
-		o = s.option(form.Value, 'brand_fg', _('Text on the brand colour'),
+		o = s.option(form.Value, 'brand_fg', _('Light mode text colour'),
 			_('Either <code>auto</code> (pick black or white by brightness) or a HEX value.'));
 		o.default = 'auto';
 		o.rmempty = false;
 		o.placeholder = 'auto';
 		o.validate = validateForeground;
 
-		o = s.option(form.Value, 'brand_fg_dark', _('Text on the brand colour (dark mode)'),
+		o = s.option(form.Value, 'brand_fg_dark', _('Dark mode text colour'),
 			_('Same as above; leave empty to reuse the light mode setting.'));
 		o.placeholder = 'auto';
 		o.validate = validateForeground;
@@ -526,11 +526,42 @@ return view.extend({
 		o.rmempty = false;
 		o.value('sidebar', _('Left sidebar'));
 		o.value('topbar', _('Top bar'));
-		o.description = _('The layout is part of the rendered page, so it changes with the next page load (save, then reload). Sub-menus open as dropdowns in top bar mode.');
+		o.description = _('Sub-menus open as dropdowns in top bar mode. Reload the page to apply.');
+
+		/* ── Icon style ───────────────────────────────────────────────── */
+		s = m.section(form.TypedSection, 'global', _('Icon style'),
+			_('Replace the stock system icons with the line-art icon set bundled with the theme.'));
+		s.anonymous = true;
+		s.addremove = false;
+
+		o = s.option(form.ListValue, 'icons', _('Icon set'));
+		o.widget = 'radio';
+		o.orientation = 'vertical';
+		o.default = 'default';
+		o.rmempty = false;
+		o.value('default', _('System built-in icons'));
+		o.value('redesign', _('Redrawn line-art icons'));
+		o.description = _('Applies to the port, signal and interface icons on the status and network pages.');
+
+		/* ── Page density ─────────────────────────────────────────────── */
+		s = m.section(form.TypedSection, 'global', _('Page density'),
+			_('Controls text size, spacing and control height across every page.'));
+		s.anonymous = true;
+		s.addremove = false;
+
+		o = s.option(form.ListValue, 'density', _('Density'));
+		o.widget = 'radio';
+		o.orientation = 'vertical';
+		o.default = 'normal';
+		o.rmempty = false;
+		o.value('compact', _('Compact'));
+		o.value('normal', _('Default'));
+		o.value('large', _('Comfortable'));
+		o.description = _('Compact fits more content on screen; comfortable gives every row more breathing room.');
 
 		/* ── Brand identity ──────────────────────────────────────────── */
 		s = m.section(form.TypedSection, 'global', _('Brand identity'),
-			_('Replaces the built-in logo and site icon. Uploaded files are stored in <code>%s</code> (outside the theme package, so they survive theme upgrades); SVG, PNG, ICO, WebP, GIF, JPG and AVIF up to %s are accepted.').format(BRAND_DIR, BRAND_LIMIT));
+			_('Replaces the built-in logo and site icon. Uploaded files are stored in <code>%s</code>; SVG, PNG, ICO, WebP, GIF, JPG and AVIF up to %s are accepted.').format(BRAND_DIR, BRAND_LIMIT));
 		s.anonymous = true;
 		s.addremove = false;
 
@@ -558,7 +589,7 @@ return view.extend({
 
 		/* ── Login wallpaper ─────────────────────────────────────────── */
 		s = m.section(form.TypedSection, 'global', _('Login wallpaper'),
-			_('Image shown on the right half of the login page. Uploaded images are stored in <code>%s</code>, which survives firmware upgrades.').format(WALLPAPER_DIR));
+			_('Image shown on the right half of the login page. Uploaded images are stored in <code>%s</code>.').format(WALLPAPER_DIR));
 		s.anonymous = true;
 		s.addremove = false;
 
@@ -575,7 +606,7 @@ return view.extend({
 				? '%s (%s)'.format(file.name, humanSize(file.size))
 				: file.name);
 		});
-		o.description = _('“Random on every visit” picks one of the uploaded images for every login page load. Uploaded files are listed at the bottom of this page and can be deleted there.');
+		o.description = _('“Random on every visit” picks one of the uploaded images for every login page load.');
 
 		o = s.option(form.Value, 'login_bg_url', _('Online image address'),
 			_('Direct <code>http://</code> or <code>https://</code> URL of an image, e.g. <code>https://picsum.photos/1920/1080?random={rand}</code>. Append <code>{rand}</code> so the browser fetches a new one on every login page load; it is replaced by a random number. A strict Content-Security-Policy on the router can block external images.'));
@@ -584,7 +615,7 @@ return view.extend({
 		o.validate = validateImageUrl;
 
 		o = s.option(form.Button, '_upload', _('Upload wallpaper'),
-			_('JPG, PNG, WebP, GIF or AVIF, up to %s and at least 64 bytes. Available space: %s.').format(UPLOAD_LIMIT, freeSize));
+			_('JPG, PNG, WebP, GIF or AVIF, up to %s and at least 64 bytes.').format(UPLOAD_LIMIT));
 		o.inputstyle = 'action';
 		o.inputtitle = _('Upload image…');
 		o.onclick = function(ev) {
@@ -605,17 +636,16 @@ return view.extend({
 		o.modalonly = true;
 
 		/* ── Uploaded files ──────────────────────────────────────────── */
-		/* Plain DOM in a section of its own: a thumbnail gallery used to live
-		   in the wallpaper widget, but custom widgets are fragile across LuCI
-		   versions (25.12/24.10 render `null` array children as the text
-		   "null"), and the list of names is all that is needed to manage the
-		   uploaded files. */
-		s = m.section(form.TypedSection);
-		s.render = function() {
-			if (!wallpapers.length)
-				return E([]);
+		/* 一份独立的清单块：已上传的壁纸 + 已上传的图标 + 可用空间。
+		   上传/删除后都会 location.reload()，所以这里只做静态渲染。 */
+		s = m.section(form.TypedSection, 'global', _('Uploaded files'));
+		s.anonymous = true;
+		s.addremove = false;
 
-			const rows = wallpapers.map(function(file) {
+		s.render = function() {
+			const blocks = [];
+
+			function fileRow(file, kind) {
 				const deleteButton = E('button', {
 					'type': 'button',
 					'class': 'btn cbi-button cbi-button-remove',
@@ -623,12 +653,18 @@ return view.extend({
 					'click': ui.createHandlerFn(null, function(ev) {
 						ev.preventDefault();
 
-						if (!confirm(_('Delete wallpaper “%s” ?').format(file.name)))
+						const question = (kind === 'brand')
+							? _('Delete icon file “%s” ?').format(file.name)
+							: _('Delete wallpaper “%s” ?').format(file.name);
+
+						if (!confirm(question))
 							return;
 
-						return callRemove(file.name, 'wallpaper').then(function(ret) {
+						return callRemove(file.name, kind).then(function(ret) {
 							if (ret && ret.result === 0) {
-								ui.addNotification(null, E('p', _('Wallpaper “%s” deleted.').format(file.name)));
+								ui.addNotification(null, E('p', (kind === 'brand')
+									? _('Icon file “%s” deleted.').format(file.name)
+									: _('Wallpaper “%s” deleted.').format(file.name)));
 								return location.reload();
 							}
 
@@ -647,57 +683,29 @@ return view.extend({
 				cells.push(deleteButton);
 
 				return E('div', { 'class': 'shd-file' }, cells);
-			});
+			}
 
-			return E('div', {}, [
-				E('h3', {}, [ _('Uploaded wallpapers') ]),
-				E('div', { 'class': 'shd-files' }, rows)
-			]);
-		};
+			if (wallpapers.length) {
+				blocks.push(E('h4', {}, [ _('Uploaded wallpapers') ]));
+				blocks.push(E('div', { 'class': 'shd-files' },
+					wallpapers.map(function(f) { return fileRow(f, 'wallpaper'); })));
+			}
 
-		/* ── Uploaded icon files ─────────────────────────────────────── */
-		s = m.section(form.TypedSection);
-		s.render = function() {
-			if (!brandFiles.length)
-				return E([]);
+			if (brandFiles.length) {
+				blocks.push(E('h4', {}, [ _('Uploaded icons') ]));
+				blocks.push(E('div', { 'class': 'shd-files' },
+					brandFiles.map(function(f) { return fileRow(f, 'brand'); })));
+			}
 
-			const rows = brandFiles.map(function(file) {
-				const deleteButton = E('button', {
-					'type': 'button',
-					'class': 'btn cbi-button cbi-button-remove',
-					'title': _('Delete “%s”').format(file.name),
-					'click': ui.createHandlerFn(null, function(ev) {
-						ev.preventDefault();
+			blocks.push(E('div', { 'class': 'cbi-value', 'style': 'margin-top:.75rem' }, [
+				E('label', { 'class': 'cbi-value-title' }, [ _('Available space') ]),
+				E('div', { 'class': 'cbi-value-field' }, [ E('strong', {}, [ freeSize ]) ])
+			]));
 
-						if (!confirm(_('Delete icon file “%s” ?').format(file.name)))
-							return;
-
-						return callRemove(file.name, 'brand').then(function(ret) {
-							if (ret && ret.result === 0) {
-								ui.addNotification(null, E('p', _('Icon file “%s” deleted.').format(file.name)));
-								return location.reload();
-							}
-
-							throw new Error(_('Failed to delete “%s”.').format(file.name));
-						}).catch(function(e) {
-							ui.addNotification(null, E('p', {}, [ e.message ]));
-						});
-					})
-				}, [ _('Delete') ]);
-
-				const cells = [ E('span', { 'class': 'shd-file-name', 'title': file.name }, [ file.name ]) ];
-
-				if (file.size > 0)
-					cells.push(E('span', { 'class': 'shd-file-size' }, [ humanSize(file.size) ]));
-
-				cells.push(deleteButton);
-
-				return E('div', { 'class': 'shd-file' }, cells);
-			});
-
-			return E('div', {}, [
-				E('h3', {}, [ _('Uploaded icon files') ]),
-				E('div', { 'class': 'shd-files' }, rows)
+			/* 自定义 render 会跳过 section 自带的标题与边框容器，这里手动补上。 */
+			return E('div', { 'class': 'cbi-section' }, [
+				E('h3', {}, [ _('Uploaded files') ]),
+				E('div', {}, blocks)
 			]);
 		};
 

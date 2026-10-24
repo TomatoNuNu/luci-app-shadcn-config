@@ -21,6 +21,12 @@ config global
 	# 导航布局: sidebar = 左侧边栏（默认）/ topbar = 顶部横向菜单（仅桌面端，窄屏仍是抽屉侧边栏）
 	option nav 'sidebar'
 
+	# 图标风格: default = OpenWrt 内置 / redesign = 主题附带的重绘线条图标
+	option icons 'default'
+
+	# 页面密度: compact = 紧凑 / normal = 普通 / large = 宽松（影响字号、间距、控件高度）
+	option density 'normal'
+
 	# 品牌图标: 空 = 主题自带；值 = brand 目录下的文件名（在设置页上传）
 	option logo ''
 	option favicon ''

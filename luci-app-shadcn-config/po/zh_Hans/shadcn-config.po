@@ -77,8 +77,8 @@ msgstr "当前主题未包含 shadcn-config 集成补丁。请按 README 应用 
 msgid "Day/night mode"
 msgstr "昼夜模式"
 
-msgid "The default colour scheme of the theme, and whether visitors may override it."
-msgstr "主题的默认配色方案，以及是否允许访客自行切换。"
+msgid "The default colour scheme of the theme."
+msgstr "主题的默认配色方案。"
 
 msgid "Mode"
 msgstr "模式"
@@ -253,3 +253,93 @@ msgstr "已上传的图标文件"
 
 msgid "Shadcn Theme"
 msgstr "Shadcn 主题"
+
+msgid "Icon style"
+msgstr "图标风格"
+
+msgid "Replace the stock system icons with the line-art icon set bundled with the theme."
+msgstr "把系统内置图标替换为随主题附带的线条风格重绘图标。"
+
+msgid "Icon set"
+msgstr "图标集"
+
+msgid "System built-in icons"
+msgstr "系统内置图标"
+
+msgid "Redrawn line-art icons"
+msgstr "重绘线条图标"
+
+msgid "Applies to the port, signal and interface icons on the status and network pages."
+msgstr "影响状态页和网络页的端口、信号与接口图标。"
+
+msgid "Page density"
+msgstr "页面密度"
+
+msgid "Controls text size, spacing and control height across every page."
+msgstr "控制所有页面的字号、间距与控件高度。"
+
+msgid "Density"
+msgstr "密度"
+
+msgid "Compact"
+msgstr "紧凑"
+
+msgid "Normal"
+msgstr "普通"
+
+msgid "Comfortable"
+msgstr "宽松"
+
+msgid "Compact fits more rows on screen; comfortable gives every row more breathing room."
+msgstr "紧凑模式一屏显示更多行；宽松模式每行更舒展。"
+
+msgid "Normal"
+msgstr "正常"
+
+msgid "Compact fits more content on screen; comfortable gives every row more breathing room."
+msgstr "紧凑模式一屏显示更多内容；宽松模式每行更舒展。"
+
+msgid "Light mode text colour"
+msgstr "浅色模式文字颜色"
+
+msgid "Dark mode text colour"
+msgstr "深色模式文字颜色"
+
+msgid "Sub-menus open as dropdowns in top bar mode. Reload the page to apply."
+msgstr "顶栏模式下子菜单以下拉面板展开，刷新页面生效。"
+
+msgid "Default"
+msgstr "默认"
+
+msgid "Uploaded icons"
+msgstr "已上传的图标"
+
+msgid "Storage"
+msgstr "存储"
+
+msgid "Free space available for wallpapers and brand images."
+msgstr "可用于壁纸与品牌图片的剩余空间。"
+
+msgid "Available space"
+msgstr "可用空间"
+
+msgid "Replaces the built-in logo and site icon. Uploaded files are stored in <code>%s</code>; SVG, PNG, ICO, WebP, GIF, JPG and AVIF up to %s are accepted."
+msgstr "替换主题自带的 Logo 和站点图标。上传的文件保存在 <code>%s</code>；支持 SVG、PNG、ICO、WebP、GIF、JPG、AVIF，最大 %s。"
+
+msgid "Image shown on the right half of the login page. Uploaded images are stored in <code>%s</code>."
+msgstr "显示在登录页右半部分的图片。上传的图片保存在 <code>%s</code>。"
+
+msgid "JPG, PNG, WebP, GIF or AVIF, up to %s and at least 64 bytes."
+msgstr "支持 JPG、PNG、WebP、GIF、AVIF，最大 %s，最小 64 字节。"
+
+msgid "Shadcn Theme Settings"
+msgstr "Shadcn 主题设置"
+
+msgid "Shadcn theme settings"
+msgstr "Shadcn 主题设置"
+
+msgid "Uploaded files"
+msgstr "已上传的文件"
+
+msgid "“Random on every visit” picks one of the uploaded images for every login page load."
+msgstr "“每次访问随机”会在每次登录页加载时从已上传图片中随机选择一张。"

@@ -4,7 +4,7 @@
 # (install the shadcn-config integration patch onto an already installed theme)
 #
 # 与 luci-theme-shadcn-patch/0001-luci-app-shadcn-config-integration.patch 完全等价：
-# 路由器上没有 git/patch，所以这里直接替换那 9 个受影响的文件。
+# 路由器上没有 git/patch，所以这里直接替换那 37 个受影响的文件。
 #
 #   写入：
 #     /usr/share/ucode/luci/template/themes/shadcn/header.ut
@@ -27,7 +27,8 @@
 #   cp -p /root/shadcn-config-patch-backup/header.ut  /usr/share/ucode/luci/template/themes/shadcn/
 #   cp -p /root/shadcn-config-patch-backup/sysauth.ut /usr/share/ucode/luci/template/themes/shadcn/
 #   rm -f /usr/share/ucode/luci/shadcn_config.uc
-#   rm -f /www/luci-static/shadcn/nav-topbar.css /www/luci-static/shadcn/patches/admin-status.css /www/luci-static/shadcn/patches/admin-network.css /www/luci-static/shadcn/patches/admin-services-passwall.css /www/luci-static/shadcn/patches/admin-system-filetransfer.css /www/luci-static/shadcn/patches/admin.css
+#   rm -f /www/luci-static/shadcn/nav-topbar.css /www/luci-static/shadcn/icons.css /www/luci-static/shadcn/patches/admin-network-wireless.css /www/luci-static/shadcn/patches/admin-status.css /www/luci-static/shadcn/patches/admin-network.css /www/luci-static/shadcn/patches/admin-services-passwall.css /www/luci-static/shadcn/patches/admin-system-filetransfer.css /www/luci-static/shadcn/patches/admin.css
+#   rm -rf /www/luci-static/shadcn/icons/redesign
 #   rm -f /tmp/luci-indexcache.*; rm -rf /tmp/luci-modulecache; /etc/init.d/rpcd reload
 #
 
@@ -192,7 +193,7 @@ cat > "$THEME_DIR/header.ut" <<'SHADCN_PATCH_PAYLOAD_EOF'
 -%}
 
 <!DOCTYPE html>
-<html lang="{{ dispatcher.lang }}" data-shadcn-media="{{ media }}" data-shadcn-nav="{{ shadcn_cfg.nav }}">
+<html lang="{{ dispatcher.lang }}" data-shadcn-media="{{ media }}" data-shadcn-nav="{{ shadcn_cfg.nav }}" data-shadcn-icons="{{ shadcn_cfg.icons }}" data-shadcn-density="{{ shadcn_cfg.density }}">
 	<head>
 		<meta charset="utf-8">
 		<meta name="theme-color" content="{{ theme_color_light }}" media="(prefers-color-scheme: light)">
@@ -230,10 +231,18 @@ cat > "$THEME_DIR/header.ut" <<'SHADCN_PATCH_PAYLOAD_EOF'
 		<link rel="stylesheet" href="{{ media }}/login.css">
 		{% else %}
 		<link rel="stylesheet" href="{{ media }}/main.css" data-luci-shell>
+		{# luci-app-shadcn-config: responsive guard (no horizontal overflow at any width) -#}
+		<link rel="stylesheet" href="{{ media }}/responsive.css" data-luci-shell>
 		{% if (shadcn_cfg.nav == 'topbar'): %}
 		{# luci-app-shadcn-config: sidebar -> horizontal top bar (desktop only) -#}
 		<link rel="stylesheet" href="{{ media }}/nav-topbar.css" data-luci-shell>
 		{% endif %}
+		{% if (shadcn_cfg.icons == 'redesign'): %}
+		{# luci-app-shadcn-config: optional redrawn icon set -#}
+		<link rel="stylesheet" href="{{ media }}/icons.css" data-luci-shell>
+		{% endif %}
+		{# luci-app-shadcn-config: page density (compact / normal / large) -#}
+		<link rel="stylesheet" href="{{ media }}/density.css" data-luci-shell>
 		{% for (let patch in patch_files): %}
 		<link rel="stylesheet" href="{{ media }}/patches/{{ patch }}.css" data-luci-patch="{{ patch }}">
 		{% endfor %}
@@ -788,6 +797,8 @@ function load() {
 		login_bg: 'default',
 		login_bg_url: null,
 		nav: 'sidebar',		/* sidebar | topbar */
+		icons: 'default',	/* default | redesign */
+		density: 'normal',	/* compact | normal | large */
 		logo: null,		/* file name inside BRAND_DIR */
 		favicon: null
 	};
@@ -847,6 +858,16 @@ function load() {
 
 	if (nav == 'topbar' || nav == 'sidebar')
 		cfg.nav = nav;
+
+	const icons = read('icons');
+
+	if (icons == 'default' || icons == 'redesign')
+		cfg.icons = icons;
+
+	const density = read('density');
+
+	if (density == 'compact' || density == 'normal' || density == 'large')
+		cfg.density = density;
 
 	const logo = read('logo');
 
@@ -1265,28 +1286,6 @@ cat > "$THEME_MEDIA/patches/admin-status.css" <<'SHADCN_PATCH_PAYLOAD_EOF'
 	border-color: var(--primary);
 	color: var(--primary-foreground);
 }
-
-
-/* ────────────────────────────────────────────────────────────────────────
- * 已连接站点：网络徽标（ifacebadge）的长文本在框内换行
- *
- * 主题的 .ifacebadge 是 inline-flex + nowrap，内容按需撑宽；长 SSID
- * （如「接入点 AP "肥猫快餐" (wifi0.network1)」）会把徽标顶出所在格子，
- * 压到右侧「MAC 地址」列上。这里让徽标不超过格子宽度，并允许文字换行。
- * ──────────────────────────────────────────────────────────────────────── */
-#wifi_assoclist_table .td { min-width: 0; }
-
-#wifi_assoclist_table .ifacebadge {
-	max-width: 100%;
-	min-width: 0;
-}
-
-#wifi_assoclist_table .ifacebadge > span {
-	min-width: 0;
-	white-space: normal;
-	overflow-wrap: anywhere;
-	line-height: 1.4;
-}
 SHADCN_PATCH_PAYLOAD_EOF
 say "已写入  $THEME_MEDIA/patches/admin-status.css"
 
@@ -1541,36 +1540,545 @@ cat > "$THEME_MEDIA/patches/admin-system-filetransfer.css" <<'SHADCN_PATCH_PAYLO
 SHADCN_PATCH_PAYLOAD_EOF
 say "已写入  $THEME_MEDIA/patches/admin-system-filetransfer.css"
 
-# ── 全局补丁样式（可读性：正文字号与行高，所有页面加载） ──
-#     -> $THEME_MEDIA/patches/admin.css
-cat > "$THEME_MEDIA/patches/admin.css" <<'SHADCN_PATCH_PAYLOAD_EOF'
+# ── 重绘图标集样式（可选，icons=redesign 时加载） ──
+#     -> $THEME_MEDIA/icons.css
+cat > "$THEME_MEDIA/icons.css" <<'SHADCN_PATCH_PAYLOAD_EOF'
 /*
- * 可读性调整（参考 luci-theme-argon 的字号与行高）
- *
- * shadcn 在 html 上把字号设成 --text-sm（0.875rem → 14px），后代所有 rem
- * 随之以 14px 为基准 —— 正文 --text-sm 实际只有 12.25px，比 argon 的正文
- * （14px）小约 12%；行高也偏紧（约 17.5px，argon 约 20px）。
- *
- * 这里只放大文字（正文回到 14px、行高 1.5），不改 --spacing 等 rem 基准，
- * 避免卡片 / 按钮 / 间距等整套布局被一起放大。
+ * 重绘图标集（可选）：把 LuCI 内置的端口 / 信号 / 接口图标换成线条风格的重绘版。
+ * 启用：/etc/config/shadcn 里 icons='redesign'（设置页「图标风格」）。
  */
-html {
-	font-size: 16px;              /* 基准 16px：后代 --text-sm = 14px（与 argon 一致） */
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/alias.svg"] {
+	content: url("icons/redesign/alias.svg");
 }
 
-body {
-	line-height: 1.5;             /* 原 1.43 */
+html[data-shadcn-icons="redesign"] img[src*="/icons/alias_disabled.svg"] {
+	content: url("icons/redesign/alias_disabled.svg");
 }
 
-/* 表格行多一点纵向留白，接近 argon 的疏朗感 */
-.table td,
-.table .td,
-.table th,
-.table .th {
-	padding-block: calc(var(--spacing) * 3);
+html[data-shadcn-icons="redesign"] img[src*="/icons/bridge.svg"] {
+	content: url("icons/redesign/bridge.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/bridge_disabled.svg"] {
+	content: url("icons/redesign/bridge_disabled.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/ethernet.svg"] {
+	content: url("icons/redesign/ethernet.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/ethernet_disabled.svg"] {
+	content: url("icons/redesign/ethernet_disabled.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/loading.svg"] {
+	content: url("icons/redesign/loading.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/port_down.svg"] {
+	content: url("icons/redesign/port_down.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/port_pse_down.svg"] {
+	content: url("icons/redesign/port_pse_down.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/port_pse_up.svg"] {
+	content: url("icons/redesign/port_pse_up.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/port_up.svg"] {
+	content: url("icons/redesign/port_up.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/signal-000-000.svg"] {
+	content: url("icons/redesign/signal-000-000.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/signal-000-025.svg"] {
+	content: url("icons/redesign/signal-000-025.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/signal-025-050.svg"] {
+	content: url("icons/redesign/signal-025-050.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/signal-050-075.svg"] {
+	content: url("icons/redesign/signal-050-075.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/signal-075-100.svg"] {
+	content: url("icons/redesign/signal-075-100.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/signal-none.svg"] {
+	content: url("icons/redesign/signal-none.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/switch.svg"] {
+	content: url("icons/redesign/switch.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/switch_disabled.svg"] {
+	content: url("icons/redesign/switch_disabled.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/tunnel.svg"] {
+	content: url("icons/redesign/tunnel.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/tunnel_disabled.svg"] {
+	content: url("icons/redesign/tunnel_disabled.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/vlan.svg"] {
+	content: url("icons/redesign/vlan.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/vlan_disabled.svg"] {
+	content: url("icons/redesign/vlan_disabled.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/vrf.svg"] {
+	content: url("icons/redesign/vrf.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/vrf_disabled.svg"] {
+	content: url("icons/redesign/vrf_disabled.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/wifi.svg"] {
+	content: url("icons/redesign/wifi.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/wifi_disabled.svg"] {
+	content: url("icons/redesign/wifi_disabled.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/wireguard.svg"] {
+	content: url("icons/redesign/wireguard.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/wireguard_disabled.svg"] {
+	content: url("icons/redesign/wireguard_disabled.svg");
 }
 SHADCN_PATCH_PAYLOAD_EOF
-say "已写入  $THEME_MEDIA/patches/admin.css"
+say "已写入  $THEME_MEDIA/icons.css"
+
+# ── 页面密度（紧凑 / 普通 / 宽松） ──
+#     -> $THEME_MEDIA/density.css
+cat > "$THEME_MEDIA/density.css" <<'SHADCN_PATCH_PAYLOAD_EOF'
+/*
+ * 页面密度（compact / normal / large）
+ *
+ * 三档的定位：
+ *   compact —— 更紧的字号与留白，一屏显示更多内容
+ *   normal  —— 主题默认观感
+ *   large   —— 宽松档，比默认再放大约 8%~22%
+ *
+ * 实现：三个乘数分别控制文字、间距、盒子（控件/侧栏），再换算成主题 token。
+ */
+
+html {
+	--dens-type: 1;
+	--dens-space: 1;
+	--dens-box: 1;
+}
+
+/* 紧凑：更小的字号和更紧的留白，一屏显示更多内容 */
+html[data-shadcn-density="compact"] {
+	--dens-type: .92;	/* 14px -> ~12.9px */
+	--dens-space: .78;	/* 卡片内边距 / 行距收紧 */
+	--dens-box: .9;		/* 控件高度 / 侧栏宽度略收 */
+}
+
+/* 正常：主题默认观感 */
+html[data-shadcn-density="normal"] {
+	--dens-type: 1;
+	--dens-space: 1;
+	--dens-box: 1;
+}
+
+/* 宽松：保持原设定 */
+html[data-shadcn-density="large"] {
+	--dens-type: 1.08;
+	--dens-space: 1.22;
+	--dens-box: 1.12;
+}
+
+/* ── 换算到主题 token ─────────────────────────────────────────────── */
+
+/* 间距体系：主题所有 padding/margin/gap 都基于 --spacing（0.25rem 的倍数） */
+html {
+	--spacing: calc(.25rem * var(--dens-space));
+}
+
+/* 字号：正文与标题 */
+html {
+	--text-xs: calc(.75rem * var(--dens-type));
+	--text-sm: calc(.875rem * var(--dens-type));
+	--text-base: calc(1rem * var(--dens-type));
+	--text-lg: calc(1.125rem * var(--dens-type));
+	--text-xl: calc(1.25rem * var(--dens-type));
+	--text-2xl: calc(1.5rem * var(--dens-type));
+}
+
+/* 控件高度：按钮 / 输入框 / 下拉框 */
+html[data-shadcn-density] .cbi-button,
+html[data-shadcn-density] input.cbi-input-text,
+html[data-shadcn-density] select.cbi-input-select {
+	padding-block: calc(var(--spacing) * calc(1.5 * var(--dens-box)));
+}
+
+/* 表格行密度 */
+html[data-shadcn-density] .table .td,
+html[data-shadcn-density] .table .th {
+	padding-block: calc(var(--spacing) * calc(2.5 * var(--dens-box)));
+}
+
+/* 侧边栏宽度 */
+html[data-shadcn-density] #sidebar { --sidebar-width: calc(16rem * var(--dens-box)); }
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/density.css"
+
+# ── 响应式兜底（任意宽度不横向溢出） ──
+#     -> $THEME_MEDIA/responsive.css
+cat > "$THEME_MEDIA/responsive.css" <<'SHADCN_PATCH_PAYLOAD_EOF'
+/*
+ * 响应式兜底（保持克制：只做"不横向溢出"和"长串可断行"）
+ *
+ * 主题本身已有窄屏布局（表格在手机上变成两列卡片、侧边栏收成抽屉），
+ * 这里不再干预表格的行列结构，只做两件事：
+ *   1. 页面级禁止横向溢出，主容器不超出视口；
+ *   2. 长串（IPv6、SSID、主机名等）允许在容器内断行，不撑破卡片。
+ */
+
+/* ── 1. 页面级防溢出 ─────────────────────────────────────────────── */
+html,
+body {
+	max-width: 100%;
+	overflow-x: hidden;
+}
+
+#main-wrapper,
+#maincontent,
+.content-card,
+.cbi-map,
+.cbi-section,
+.cbi-section-node,
+.cbi-value,
+.cbi-value-field,
+.ifacebox,
+.table {
+	max-width: 100%;
+	box-sizing: border-box;
+}
+
+/* flex/grid 子项允许收缩（否则内容会把容器顶宽） */
+.cbi-value > *,
+.cbi-value-field > *,
+.ifacebox-body > * {
+	min-width: 0;
+}
+
+/* ── 2. 长串断行 ─────────────────────────────────────────────────── */
+.cbi-value-field,
+.cbi-value-title,
+.cbi-section-descr,
+.table .td,
+.table .th,
+.ifacebadge,
+.ifacebadge > span,
+p,
+li,
+code {
+	overflow-wrap: anywhere;
+	word-break: break-word;
+}
+
+/* ── 3. 弹窗：窄屏只调宽度，不动 display ─────────────────────────
+ * 注意：绝不要给 #modal_overlay 设 display —— 主题用 `display:none` 隐藏遮罩、
+ * 用 `.modal-overlay-active` 显示；覆盖 display 会导致弹窗关不掉。
+ */
+@media (max-width: 767px) {
+	#modal_overlay {
+		padding: calc(var(--spacing) * 2);
+	}
+
+	#modal_overlay > .modal {
+		width: auto;
+		max-width: 100%;
+		min-width: 0;
+		margin: 0 auto;
+		box-sizing: border-box;
+	}
+}
+
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 底部操作栏：所有按钮统一高度
+ *
+ * 「保存并应用」是 split button（主按钮 + 下拉箭头），内部结构比普通按钮高；
+ * 而 #maincontent .cbi-page-actions 用的是 align-items: center，各按钮按自身
+ * 高度居中，于是这一组看起来参差不齐。这里给整组统一高度。
+ * ──────────────────────────────────────────────────────────────────────── */
+#maincontent .cbi-page-actions {
+	align-items: stretch;
+}
+
+#maincontent .cbi-page-actions > .cbi-button,
+#maincontent .cbi-page-actions > .btn,
+#maincontent .cbi-page-actions > button,
+#maincontent .cbi-page-actions > div > .cbi-button,
+#maincontent .cbi-page-actions > div > .btn {
+	min-height: calc(var(--spacing) * 10);
+	height: calc(var(--spacing) * 10);
+	box-sizing: border-box;
+	align-items: center;
+}
+
+/* split button 的两个部分都要撑满这一组的高度 */
+#maincontent .cbi-page-actions .cbi-button-group,
+#maincontent .cbi-page-actions .btn-group {
+	display: flex;
+	align-items: stretch;
+	height: calc(var(--spacing) * 10);
+}
+
+#maincontent .cbi-page-actions .cbi-button-group > *,
+#maincontent .cbi-page-actions .btn-group > * {
+	height: 100%;
+	box-sizing: border-box;
+}
+
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 端口 / 接口卡片：标题条圆角与外框对齐
+ *
+ * .ifacebox 有 1px 边框，标题条圆角用的是同一个 --radius-base —— 边框占掉
+ * 1px 后两者弧线错开，四个角会露出背景色。把标题条圆角扣掉边框宽度即可贴合。
+ * ──────────────────────────────────────────────────────────────────────── */
+.ifacebox > .ifacebox-head {
+	border-top-left-radius: calc(var(--radius-base) - 1px) !important;
+	border-top-right-radius: calc(var(--radius-base) - 1px) !important;
+}
+
+.ifacebox > .ifacebox-body {
+	border-bottom-right-radius: calc(var(--radius-base) - 1px) !important;
+	border-bottom-left-radius: calc(var(--radius-base) - 1px) !important;
+}
+
+/* 无边框的卡片（用 box-shadow 的那类）保持原圆角 */
+.ifacebox[style*="border: none"] > .ifacebox-head {
+	border-top-left-radius: var(--radius-base) !important;
+	border-top-right-radius: var(--radius-base) !important;
+}
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/responsive.css"
+
+# ── 重绘图标 alias.svg ──
+#     -> $THEME_MEDIA/icons/redesign/alias.svg
+cat > "$THEME_MEDIA/icons/redesign/alias.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/alias.svg"
+
+# ── 重绘图标 alias_disabled.svg ──
+#     -> $THEME_MEDIA/icons/redesign/alias_disabled.svg
+cat > "$THEME_MEDIA/icons/redesign/alias_disabled.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g opacity="0.45"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></g><path d="M2 2l20 20" stroke="#E5534B" stroke-width="2.2"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/alias_disabled.svg"
+
+# ── 重绘图标 bridge.svg ──
+#     -> $THEME_MEDIA/icons/redesign/bridge.svg
+cat > "$THEME_MEDIA/icons/redesign/bridge.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 13.5a7.5 7.5 0 0 1 15 0"/><path d="M2 13.5h20"/><path d="M5.5 13.5v4.2M12 13.5v4.2M18.5 13.5v4.2"/><path d="M2.5 19.7h3.4M18.1 19.7h3.4"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/bridge.svg"
+
+# ── 重绘图标 bridge_disabled.svg ──
+#     -> $THEME_MEDIA/icons/redesign/bridge_disabled.svg
+cat > "$THEME_MEDIA/icons/redesign/bridge_disabled.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g opacity="0.45"><path d="M4.5 13.5a7.5 7.5 0 0 1 15 0"/><path d="M2 13.5h20"/><path d="M5.5 13.5v4.2M12 13.5v4.2M18.5 13.5v4.2"/><path d="M2.5 19.7h3.4M18.1 19.7h3.4"/></g><path d="M2 2l20 20" stroke="#E5534B" stroke-width="2.2"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/bridge_disabled.svg"
+
+# ── 重绘图标 ethernet.svg ──
+#     -> $THEME_MEDIA/icons/redesign/ethernet.svg
+cat > "$THEME_MEDIA/icons/redesign/ethernet.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8v1"/><path d="M14 8v1"/><path d="M18 8v1"/><path d="M19 17a2 2 0 00-1.765 1.059l-.47.882A2 2 0 0115 20H9a2 2 0 01-1.765-1.059l-.47-.882A2 2 0 005 17H4a2 2 0 01-2-2V6a2 2 0 012-2h16a2 2 0 012 2v9a2 2 0 01-2 2z"/><path d="M6 8v1"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/ethernet.svg"
+
+# ── 重绘图标 ethernet_disabled.svg ──
+#     -> $THEME_MEDIA/icons/redesign/ethernet_disabled.svg
+cat > "$THEME_MEDIA/icons/redesign/ethernet_disabled.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g opacity="0.45"><path d="M10 8v1"/><path d="M14 8v1"/><path d="M18 8v1"/><path d="M19 17a2 2 0 00-1.765 1.059l-.47.882A2 2 0 0115 20H9a2 2 0 01-1.765-1.059l-.47-.882A2 2 0 005 17H4a2 2 0 01-2-2V6a2 2 0 012-2h16a2 2 0 012 2v9a2 2 0 01-2 2z"/><path d="M6 8v1"/></g><path d="M2 2l20 20" stroke="#E5534B" stroke-width="2.2"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/ethernet_disabled.svg"
+
+# ── 重绘图标 loading.svg ──
+#     -> $THEME_MEDIA/icons/redesign/loading.svg
+cat > "$THEME_MEDIA/icons/redesign/loading.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/loading.svg"
+
+# ── 重绘图标 port_down.svg ──
+#     -> $THEME_MEDIA/icons/redesign/port_down.svg
+cat > "$THEME_MEDIA/icons/redesign/port_down.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8v1"/><path d="M14 8v1"/><path d="M18 8v1"/><path d="M19 17a2 2 0 00-1.765 1.059l-.47.882A2 2 0 0115 20H9a2 2 0 01-1.765-1.059l-.47-.882A2 2 0 005 17H4a2 2 0 01-2-2V6a2 2 0 012-2h16a2 2 0 012 2v9a2 2 0 01-2 2z"/><path d="M6 8v1"/><circle cx="7" cy="13.5" r="1.35" fill="#8A90A2" stroke="none" opacity="0.35"/><circle cx="17" cy="13.5" r="1.35" fill="#8A90A2" stroke="none" opacity="0.35"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/port_down.svg"
+
+# ── 重绘图标 port_pse_down.svg ──
+#     -> $THEME_MEDIA/icons/redesign/port_pse_down.svg
+cat > "$THEME_MEDIA/icons/redesign/port_pse_down.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8v1"/><path d="M14 8v1"/><path d="M18 8v1"/><path d="M19 17a2 2 0 00-1.765 1.059l-.47.882A2 2 0 0115 20H9a2 2 0 01-1.765-1.059l-.47-.882A2 2 0 005 17H4a2 2 0 01-2-2V6a2 2 0 012-2h16a2 2 0 012 2v9a2 2 0 01-2 2z"/><path d="M6 8v1"/><circle cx="7" cy="13.5" r="1.35" fill="#8A90A2" stroke="none" opacity="0.35"/><circle cx="17" cy="13.5" r="1.35" fill="#8A90A2" stroke="none" opacity="0.35"/><g transform="translate(15.52 1.32) scale(0.34)" stroke="#E8A33D" stroke-width="4.7"><path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"/></g></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/port_pse_down.svg"
+
+# ── 重绘图标 port_pse_up.svg ──
+#     -> $THEME_MEDIA/icons/redesign/port_pse_up.svg
+cat > "$THEME_MEDIA/icons/redesign/port_pse_up.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8v1"/><path d="M14 8v1"/><path d="M18 8v1"/><path d="M19 17a2 2 0 00-1.765 1.059l-.47.882A2 2 0 0115 20H9a2 2 0 01-1.765-1.059l-.47-.882A2 2 0 005 17H4a2 2 0 01-2-2V6a2 2 0 012-2h16a2 2 0 012 2v9a2 2 0 01-2 2z"/><path d="M6 8v1"/><circle cx="7" cy="13.5" r="1.35" fill="#3FB950" stroke="none"/><circle cx="17" cy="13.5" r="1.35" fill="#3FB950" stroke="none"/><g transform="translate(15.52 1.32) scale(0.34)" stroke="#E8A33D" stroke-width="4.7"><path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"/></g></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/port_pse_up.svg"
+
+# ── 重绘图标 port_up.svg ──
+#     -> $THEME_MEDIA/icons/redesign/port_up.svg
+cat > "$THEME_MEDIA/icons/redesign/port_up.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8v1"/><path d="M14 8v1"/><path d="M18 8v1"/><path d="M19 17a2 2 0 00-1.765 1.059l-.47.882A2 2 0 0115 20H9a2 2 0 01-1.765-1.059l-.47-.882A2 2 0 005 17H4a2 2 0 01-2-2V6a2 2 0 012-2h16a2 2 0 012 2v9a2 2 0 01-2 2z"/><path d="M6 8v1"/><circle cx="7" cy="13.5" r="1.35" fill="#3FB950" stroke="none"/><circle cx="17" cy="13.5" r="1.35" fill="#3FB950" stroke="none"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/port_up.svg"
+
+# ── 重绘图标 signal-000-000.svg ──
+#     -> $THEME_MEDIA/icons/redesign/signal-000-000.svg
+cat > "$THEME_MEDIA/icons/redesign/signal-000-000.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h.01"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/signal-000-000.svg"
+
+# ── 重绘图标 signal-000-025.svg ──
+#     -> $THEME_MEDIA/icons/redesign/signal-000-025.svg
+cat > "$THEME_MEDIA/icons/redesign/signal-000-025.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h.01"/><path d="M7 20v-4"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/signal-000-025.svg"
+
+# ── 重绘图标 signal-025-050.svg ──
+#     -> $THEME_MEDIA/icons/redesign/signal-025-050.svg
+cat > "$THEME_MEDIA/icons/redesign/signal-025-050.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/signal-025-050.svg"
+
+# ── 重绘图标 signal-050-075.svg ──
+#     -> $THEME_MEDIA/icons/redesign/signal-050-075.svg
+cat > "$THEME_MEDIA/icons/redesign/signal-050-075.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/signal-050-075.svg"
+
+# ── 重绘图标 signal-075-100.svg ──
+#     -> $THEME_MEDIA/icons/redesign/signal-075-100.svg
+cat > "$THEME_MEDIA/icons/redesign/signal-075-100.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/signal-075-100.svg"
+
+# ── 重绘图标 signal-none.svg ──
+#     -> $THEME_MEDIA/icons/redesign/signal-none.svg
+cat > "$THEME_MEDIA/icons/redesign/signal-none.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h.01"/><path d="M2 2l20 20" stroke="#E5534B" stroke-width="2.2"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/signal-none.svg"
+
+# ── 重绘图标 switch.svg ──
+#     -> $THEME_MEDIA/icons/redesign/switch.svg
+cat > "$THEME_MEDIA/icons/redesign/switch.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/switch.svg"
+
+# ── 重绘图标 switch_disabled.svg ──
+#     -> $THEME_MEDIA/icons/redesign/switch_disabled.svg
+cat > "$THEME_MEDIA/icons/redesign/switch_disabled.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g opacity="0.45"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></g><path d="M2 2l20 20" stroke="#E5534B" stroke-width="2.2"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/switch_disabled.svg"
+
+# ── 重绘图标 tunnel.svg ──
+#     -> $THEME_MEDIA/icons/redesign/tunnel.svg
+cat > "$THEME_MEDIA/icons/redesign/tunnel.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20v-6.7a7 7 0 0 1 14 0V20"/><path d="M2 20h20"/><path d="M12 19.4v-1.7M12 14.6v-1.7"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/tunnel.svg"
+
+# ── 重绘图标 tunnel_disabled.svg ──
+#     -> $THEME_MEDIA/icons/redesign/tunnel_disabled.svg
+cat > "$THEME_MEDIA/icons/redesign/tunnel_disabled.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g opacity="0.45"><path d="M5 20v-6.7a7 7 0 0 1 14 0V20"/><path d="M2 20h20"/><path d="M12 19.4v-1.7M12 14.6v-1.7"/></g><path d="M2 2l20 20" stroke="#E5534B" stroke-width="2.2"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/tunnel_disabled.svg"
+
+# ── 重绘图标 vlan.svg ──
+#     -> $THEME_MEDIA/icons/redesign/vlan.svg
+cat > "$THEME_MEDIA/icons/redesign/vlan.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="#8A90A2"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/vlan.svg"
+
+# ── 重绘图标 vlan_disabled.svg ──
+#     -> $THEME_MEDIA/icons/redesign/vlan_disabled.svg
+cat > "$THEME_MEDIA/icons/redesign/vlan_disabled.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g opacity="0.45"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="#8A90A2"/></g><path d="M2 2l20 20" stroke="#E5534B" stroke-width="2.2"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/vlan_disabled.svg"
+
+# ── 重绘图标 vrf.svg ──
+#     -> $THEME_MEDIA/icons/redesign/vrf.svg
+cat > "$THEME_MEDIA/icons/redesign/vrf.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><path d="M18 9v2c0 .6-.4 1-1 1H7c-.6 0-1-.4-1-1V9"/><path d="M12 12v3"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/vrf.svg"
+
+# ── 重绘图标 vrf_disabled.svg ──
+#     -> $THEME_MEDIA/icons/redesign/vrf_disabled.svg
+cat > "$THEME_MEDIA/icons/redesign/vrf_disabled.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g opacity="0.45"><circle cx="12" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><path d="M18 9v2c0 .6-.4 1-1 1H7c-.6 0-1-.4-1-1V9"/><path d="M12 12v3"/></g><path d="M2 2l20 20" stroke="#E5534B" stroke-width="2.2"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/vrf_disabled.svg"
+
+# ── 重绘图标 wifi.svg ──
+#     -> $THEME_MEDIA/icons/redesign/wifi.svg
+cat > "$THEME_MEDIA/icons/redesign/wifi.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/wifi.svg"
+
+# ── 重绘图标 wifi_disabled.svg ──
+#     -> $THEME_MEDIA/icons/redesign/wifi_disabled.svg
+cat > "$THEME_MEDIA/icons/redesign/wifi_disabled.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g opacity="0.45"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/></g><path d="M2 2l20 20" stroke="#E5534B" stroke-width="2.2"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/wifi_disabled.svg"
+
+# ── 重绘图标 wireguard.svg ──
+#     -> $THEME_MEDIA/icons/redesign/wireguard.svg
+cat > "$THEME_MEDIA/icons/redesign/wireguard.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M8.6 10.3l1.8 5.5 1.6-3 1.6 3 1.8-5.5"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/wireguard.svg"
+
+# ── 重绘图标 wireguard_disabled.svg ──
+#     -> $THEME_MEDIA/icons/redesign/wireguard_disabled.svg
+cat > "$THEME_MEDIA/icons/redesign/wireguard_disabled.svg" <<'SHADCN_PATCH_PAYLOAD_EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A90A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g opacity="0.45"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M8.6 10.3l1.8 5.5 1.6-3 1.6 3 1.8-5.5"/></g><path d="M2 2l20 20" stroke="#E5534B" stroke-width="2.2"/></svg>
+SHADCN_PATCH_PAYLOAD_EOF
+say "已写入  $THEME_MEDIA/icons/redesign/wireguard_disabled.svg"
 
 
 chmod 0644 "$THEME_DIR/header.ut" "$THEME_DIR/sysauth.ut" "$MODULE"
@@ -1588,7 +2096,7 @@ grep -q 'luci\.shadcn_config' "$THEME_DIR/sysauth.ut" \
 [ -s "$THEME_MEDIA/patches/admin-system-filetransfer.css" ] || die "写入后校验失败：patches/admin-system-filetransfer.css 为空"
 [ -s "$THEME_MEDIA/patches/admin.css" ] || die "写入后校验失败：patches/admin.css 为空"
 
-say "文件校验通过：9 个文件均已就位。"
+say "文件校验通过：37 个文件均已就位。"
 
 # ── 5. 编译自检（用系统自带的 ucode）────────────────────────────────────
 # 模板编译失败会让 LuCI 静默切换到别的主题（luci.runtime 的 trycompile），

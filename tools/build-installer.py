@@ -60,9 +60,164 @@ PAYLOADS = [
         "文件传输页补丁样式（按钮主色 / 浏览按钮块 / 窄屏自适应，按页加载）",
     ),
     (
-        "htdocs/luci-static/shadcn/patches/admin.css",
-        "$THEME_MEDIA/patches/admin.css",
-        "全局补丁样式（可读性：正文字号与行高，所有页面加载）",
+        "htdocs/luci-static/shadcn/icons.css",
+        "$THEME_MEDIA/icons.css",
+        "重绘图标集样式（可选，icons=redesign 时加载）",
+    ),
+    (
+        "htdocs/luci-static/shadcn/density.css",
+        "$THEME_MEDIA/density.css",
+        "页面密度（紧凑 / 普通 / 宽松）",
+    ),
+    (
+        "htdocs/luci-static/shadcn/responsive.css",
+        "$THEME_MEDIA/responsive.css",
+        "响应式兜底（任意宽度不横向溢出）",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/alias.svg",
+        "$THEME_MEDIA/icons/redesign/alias.svg",
+        "重绘图标 alias.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/alias_disabled.svg",
+        "$THEME_MEDIA/icons/redesign/alias_disabled.svg",
+        "重绘图标 alias_disabled.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/bridge.svg",
+        "$THEME_MEDIA/icons/redesign/bridge.svg",
+        "重绘图标 bridge.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/bridge_disabled.svg",
+        "$THEME_MEDIA/icons/redesign/bridge_disabled.svg",
+        "重绘图标 bridge_disabled.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/ethernet.svg",
+        "$THEME_MEDIA/icons/redesign/ethernet.svg",
+        "重绘图标 ethernet.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/ethernet_disabled.svg",
+        "$THEME_MEDIA/icons/redesign/ethernet_disabled.svg",
+        "重绘图标 ethernet_disabled.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/loading.svg",
+        "$THEME_MEDIA/icons/redesign/loading.svg",
+        "重绘图标 loading.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/port_down.svg",
+        "$THEME_MEDIA/icons/redesign/port_down.svg",
+        "重绘图标 port_down.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/port_pse_down.svg",
+        "$THEME_MEDIA/icons/redesign/port_pse_down.svg",
+        "重绘图标 port_pse_down.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/port_pse_up.svg",
+        "$THEME_MEDIA/icons/redesign/port_pse_up.svg",
+        "重绘图标 port_pse_up.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/port_up.svg",
+        "$THEME_MEDIA/icons/redesign/port_up.svg",
+        "重绘图标 port_up.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/signal-000-000.svg",
+        "$THEME_MEDIA/icons/redesign/signal-000-000.svg",
+        "重绘图标 signal-000-000.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/signal-000-025.svg",
+        "$THEME_MEDIA/icons/redesign/signal-000-025.svg",
+        "重绘图标 signal-000-025.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/signal-025-050.svg",
+        "$THEME_MEDIA/icons/redesign/signal-025-050.svg",
+        "重绘图标 signal-025-050.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/signal-050-075.svg",
+        "$THEME_MEDIA/icons/redesign/signal-050-075.svg",
+        "重绘图标 signal-050-075.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/signal-075-100.svg",
+        "$THEME_MEDIA/icons/redesign/signal-075-100.svg",
+        "重绘图标 signal-075-100.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/signal-none.svg",
+        "$THEME_MEDIA/icons/redesign/signal-none.svg",
+        "重绘图标 signal-none.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/switch.svg",
+        "$THEME_MEDIA/icons/redesign/switch.svg",
+        "重绘图标 switch.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/switch_disabled.svg",
+        "$THEME_MEDIA/icons/redesign/switch_disabled.svg",
+        "重绘图标 switch_disabled.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/tunnel.svg",
+        "$THEME_MEDIA/icons/redesign/tunnel.svg",
+        "重绘图标 tunnel.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/tunnel_disabled.svg",
+        "$THEME_MEDIA/icons/redesign/tunnel_disabled.svg",
+        "重绘图标 tunnel_disabled.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/vlan.svg",
+        "$THEME_MEDIA/icons/redesign/vlan.svg",
+        "重绘图标 vlan.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/vlan_disabled.svg",
+        "$THEME_MEDIA/icons/redesign/vlan_disabled.svg",
+        "重绘图标 vlan_disabled.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/vrf.svg",
+        "$THEME_MEDIA/icons/redesign/vrf.svg",
+        "重绘图标 vrf.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/vrf_disabled.svg",
+        "$THEME_MEDIA/icons/redesign/vrf_disabled.svg",
+        "重绘图标 vrf_disabled.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/wifi.svg",
+        "$THEME_MEDIA/icons/redesign/wifi.svg",
+        "重绘图标 wifi.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/wifi_disabled.svg",
+        "$THEME_MEDIA/icons/redesign/wifi_disabled.svg",
+        "重绘图标 wifi_disabled.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/wireguard.svg",
+        "$THEME_MEDIA/icons/redesign/wireguard.svg",
+        "重绘图标 wireguard.svg",
+    ),
+    (
+        "htdocs/luci-static/shadcn/icons/redesign/wireguard_disabled.svg",
+        "$THEME_MEDIA/icons/redesign/wireguard_disabled.svg",
+        "重绘图标 wireguard_disabled.svg",
     ),
 ]
 
@@ -72,7 +227,7 @@ HEADER = r'''#!/bin/sh
 # (install the shadcn-config integration patch onto an already installed theme)
 #
 # 与 luci-theme-shadcn-patch/0001-luci-app-shadcn-config-integration.patch 完全等价：
-# 路由器上没有 git/patch，所以这里直接替换那 9 个受影响的文件。
+# 路由器上没有 git/patch，所以这里直接替换那 37 个受影响的文件。
 #
 #   写入：
 #     /usr/share/ucode/luci/template/themes/shadcn/header.ut
@@ -95,7 +250,8 @@ HEADER = r'''#!/bin/sh
 #   cp -p /root/shadcn-config-patch-backup/header.ut  /usr/share/ucode/luci/template/themes/shadcn/
 #   cp -p /root/shadcn-config-patch-backup/sysauth.ut /usr/share/ucode/luci/template/themes/shadcn/
 #   rm -f /usr/share/ucode/luci/shadcn_config.uc
-#   rm -f /www/luci-static/shadcn/nav-topbar.css /www/luci-static/shadcn/patches/admin-status.css /www/luci-static/shadcn/patches/admin-network.css /www/luci-static/shadcn/patches/admin-services-passwall.css /www/luci-static/shadcn/patches/admin-system-filetransfer.css /www/luci-static/shadcn/patches/admin.css
+#   rm -f /www/luci-static/shadcn/nav-topbar.css /www/luci-static/shadcn/icons.css /www/luci-static/shadcn/patches/admin-network-wireless.css /www/luci-static/shadcn/patches/admin-status.css /www/luci-static/shadcn/patches/admin-network.css /www/luci-static/shadcn/patches/admin-services-passwall.css /www/luci-static/shadcn/patches/admin-system-filetransfer.css /www/luci-static/shadcn/patches/admin.css
+#   rm -rf /www/luci-static/shadcn/icons/redesign
 #   rm -f /tmp/luci-indexcache.*; rm -rf /tmp/luci-modulecache; /etc/init.d/rpcd reload
 #
 
@@ -184,7 +340,7 @@ grep -q 'luci\.shadcn_config' "$THEME_DIR/sysauth.ut" \
 [ -s "$THEME_MEDIA/patches/admin-system-filetransfer.css" ] || die "写入后校验失败：patches/admin-system-filetransfer.css 为空"
 [ -s "$THEME_MEDIA/patches/admin.css" ] || die "写入后校验失败：patches/admin.css 为空"
 
-say "文件校验通过：9 个文件均已就位。"
+say "文件校验通过：37 个文件均已就位。"
 
 # ── 5. 编译自检（用系统自带的 ucode）────────────────────────────────────
 # 模板编译失败会让 LuCI 静默切换到别的主题（luci.runtime 的 trycompile），

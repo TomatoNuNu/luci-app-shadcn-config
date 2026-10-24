@@ -34,7 +34,7 @@ import tarfile
 BUILD_EPOCH = int(os.environ.get("SOURCE_DATE_EPOCH", "1781000000"))
 
 APP_NAME = "luci-app-shadcn-config"
-APP_VERSION = "1.0.8"
+APP_VERSION = "1.0.9"
 APP_RELEASE = "20261013"
 APP_DESCRIPTION = (
     "Settings page for the shadcn LuCI theme: login wallpaper, HEX brand colour "
@@ -45,7 +45,7 @@ APP_URL = "https://github.com/eamonxg/luci-theme-shadcn"
 
 THEME_NAME = "luci-theme-shadcn"
 THEME_VERSION = "0.6.0"
-THEME_RELEASE = "20261013.19"
+THEME_RELEASE = "20261024.1"
 THEME_DESCRIPTION = (
     "A modern sidebar LuCI theme for OpenWrt, built with shadcn/ui design "
     "language (with luci-app-shadcn-config integration)."

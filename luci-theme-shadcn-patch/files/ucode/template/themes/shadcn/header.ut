@@ -88,7 +88,7 @@
 -%}
 
 <!DOCTYPE html>
-<html lang="{{ dispatcher.lang }}" data-shadcn-media="{{ media }}" data-shadcn-nav="{{ shadcn_cfg.nav }}">
+<html lang="{{ dispatcher.lang }}" data-shadcn-media="{{ media }}" data-shadcn-nav="{{ shadcn_cfg.nav }}" data-shadcn-icons="{{ shadcn_cfg.icons }}" data-shadcn-density="{{ shadcn_cfg.density }}">
 	<head>
 		<meta charset="utf-8">
 		<meta name="theme-color" content="{{ theme_color_light }}" media="(prefers-color-scheme: light)">
@@ -126,10 +126,18 @@
 		<link rel="stylesheet" href="{{ media }}/login.css">
 		{% else %}
 		<link rel="stylesheet" href="{{ media }}/main.css" data-luci-shell>
+		{# luci-app-shadcn-config: responsive guard (no horizontal overflow at any width) -#}
+		<link rel="stylesheet" href="{{ media }}/responsive.css" data-luci-shell>
 		{% if (shadcn_cfg.nav == 'topbar'): %}
 		{# luci-app-shadcn-config: sidebar -> horizontal top bar (desktop only) -#}
 		<link rel="stylesheet" href="{{ media }}/nav-topbar.css" data-luci-shell>
 		{% endif %}
+		{% if (shadcn_cfg.icons == 'redesign'): %}
+		{# luci-app-shadcn-config: optional redrawn icon set -#}
+		<link rel="stylesheet" href="{{ media }}/icons.css" data-luci-shell>
+		{% endif %}
+		{# luci-app-shadcn-config: page density (compact / normal / large) -#}
+		<link rel="stylesheet" href="{{ media }}/density.css" data-luci-shell>
 		{% for (let patch in patch_files): %}
 		<link rel="stylesheet" href="{{ media }}/patches/{{ patch }}.css" data-luci-patch="{{ patch }}">
 		{% endfor %}

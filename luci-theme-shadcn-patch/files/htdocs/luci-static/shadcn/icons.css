@@ -1,0 +1,120 @@
+/*
+ * 重绘图标集（可选）：把 LuCI 内置的端口 / 信号 / 接口图标换成线条风格的重绘版。
+ * 启用：/etc/config/shadcn 里 icons='redesign'（设置页「图标风格」）。
+ */
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/alias.svg"] {
+	content: url("icons/redesign/alias.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/alias_disabled.svg"] {
+	content: url("icons/redesign/alias_disabled.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/bridge.svg"] {
+	content: url("icons/redesign/bridge.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/bridge_disabled.svg"] {
+	content: url("icons/redesign/bridge_disabled.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/ethernet.svg"] {
+	content: url("icons/redesign/ethernet.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/ethernet_disabled.svg"] {
+	content: url("icons/redesign/ethernet_disabled.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/loading.svg"] {
+	content: url("icons/redesign/loading.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/port_down.svg"] {
+	content: url("icons/redesign/port_down.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/port_pse_down.svg"] {
+	content: url("icons/redesign/port_pse_down.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/port_pse_up.svg"] {
+	content: url("icons/redesign/port_pse_up.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/port_up.svg"] {
+	content: url("icons/redesign/port_up.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/signal-000-000.svg"] {
+	content: url("icons/redesign/signal-000-000.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/signal-000-025.svg"] {
+	content: url("icons/redesign/signal-000-025.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/signal-025-050.svg"] {
+	content: url("icons/redesign/signal-025-050.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/signal-050-075.svg"] {
+	content: url("icons/redesign/signal-050-075.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/signal-075-100.svg"] {
+	content: url("icons/redesign/signal-075-100.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/signal-none.svg"] {
+	content: url("icons/redesign/signal-none.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/switch.svg"] {
+	content: url("icons/redesign/switch.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/switch_disabled.svg"] {
+	content: url("icons/redesign/switch_disabled.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/tunnel.svg"] {
+	content: url("icons/redesign/tunnel.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/tunnel_disabled.svg"] {
+	content: url("icons/redesign/tunnel_disabled.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/vlan.svg"] {
+	content: url("icons/redesign/vlan.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/vlan_disabled.svg"] {
+	content: url("icons/redesign/vlan_disabled.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/vrf.svg"] {
+	content: url("icons/redesign/vrf.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/vrf_disabled.svg"] {
+	content: url("icons/redesign/vrf_disabled.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/wifi.svg"] {
+	content: url("icons/redesign/wifi.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/wifi_disabled.svg"] {
+	content: url("icons/redesign/wifi_disabled.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/wireguard.svg"] {
+	content: url("icons/redesign/wireguard.svg");
+}
+
+html[data-shadcn-icons="redesign"] img[src*="/icons/wireguard_disabled.svg"] {
+	content: url("icons/redesign/wireguard_disabled.svg");
+}
