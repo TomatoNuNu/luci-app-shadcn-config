@@ -35,7 +35,7 @@ Settings live in `/etc/config/shadcn`; the theme reads them while rendering. Cha
 | Path | Contents |
 | --- | --- |
 | `luci-app-shadcn-config/` | settings app (view, rpcd, translations) |
-| `luci-theme-shadcn-patch/` | theme integration patch (patch file, patched copies, installer) |
+| `luci-theme-shadcn-patch/` | theme integration: patched file copies + one-shot installer |
 | `ref/luci-theme-shadcn/` | upstream theme source (build baseline, not tracked) |
 | `dist/` | build output (not tracked) |
 | `tools/` | packaging and self-check scripts |
@@ -69,9 +69,9 @@ Without the patched theme the settings have no effect.
 From the OpenWrt tree / SDK:
 
 ```sh
-# 1) apply the theme integration patch (inside the theme source)
-cd package/luci-theme-shadcn          # or feeds/luci/themes/luci-theme-shadcn
-patch -p1 < /path/to/luci-theme-shadcn-patch/0001-luci-app-shadcn-config-integration.patch
+# 1) copy the integration files over the theme source (from the OpenWrt tree root)
+cp -r /path/to/luci-theme-shadcn-patch/files/. package/luci-theme-shadcn/
+#   the real path may be feeds/luci/themes/luci-theme-shadcn
 
 # 2) drop in the settings app
 cp -r /path/to/luci-app-shadcn-config package/
@@ -85,8 +85,8 @@ make package/luci-app-shadcn-config/compile V=s
 ```
 
 Output lands in `bin/packages/<arch>/base/` (opkg) or `bin/packages/<arch>/apk/` (25.12+).
-Alternatively skip the patch and copy the pre-patched files from `luci-theme-shadcn-patch/files/`
-over the theme source.
+Already running the stock theme and do not want to rebuild? Run `sh install-theme-patch.sh` on the
+router — it writes the same files in place.
 
 ### Build
 

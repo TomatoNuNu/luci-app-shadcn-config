@@ -1,36 +1,37 @@
-# 主题侧集成补丁
+# 主题侧集成
 
-这是 `luci-theme-shadcn` 的补丁：让主题读取 `luci-app-shadcn-config` 写入的 `/etc/config/shadcn`。
-三种用法任选其一：
+这是 `luci-theme-shadcn` 的集成文件：让主题读取 `luci-app-shadcn-config` 写入的 `/etc/config/shadcn`。
+
+两种用法：
 
 ```sh
-# ① 主题已经装在路由器上、只想补上集成（最常用）—— 见下方"在路由器上安装"
+# ① 主题已经装在路由器上、只想补上集成（最常用）
 scp tools/install-theme-patch.sh root@<路由器IP>:/tmp/ && ssh root@<路由器IP> sh /tmp/install-theme-patch.sh
 
-# ② 编译时用 git 补丁（针对上游 main 分支提交 17c37b59ea244e7de89e4e3b3de3b85690ec9d04 生成）
-cd luci-theme-shadcn
-git apply /path/to/0001-luci-app-shadcn-config-integration.patch
-
-# ③ 编译时不用 git，直接覆盖文件
-cp -r files/* luci-theme-shadcn/
+# ② 编译时直接覆盖文件（在 OpenWrt 源码树根目录执行）
+cp -r luci-theme-shadcn-patch/files/. package/luci-theme-shadcn/
 ```
 
-补丁内容：
+`files/` 里是**完整的、可直接覆盖**的文件树（40 个文件），不再提供 git patch。
 
-| 文件                                            | 作用                                                                                                         |
-| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `Makefile`                                    | `PKG_RELEASE` 由 `20260920` 提到 `20261013.9`，让自己编译的包版本高于上游未打补丁的发行版，避免 `opkg upgrade` 被 feed 覆盖                |
-| `ucode/template/themes/shadcn/header.ut`      | 读取配置 → 注入主色调 token 覆盖样式、`<meta name="theme-color">`、`window.SHADCN_THEME_CONFIG`（昼夜策略）、自定义 favicon 链接、`window.SHADCN_LOGO_URL` 与侧边栏 logo 替换脚本、`<html data-shadcn-nav>` 与顶栏样式表 |
-| `ucode/template/themes/shadcn/sysauth.ut`     | 登录页 `--login-bg-image` 按配置取 `default` / `random` / `online` / 指定文件；登录页 logo 按配置替换                        |
-| `root/usr/share/ucode/luci/shadcn_config.uc`  | 新增的主题侧脚本：读取并校验配置、生成 CSS 变量、解析壁纸（内置图 / 已上传文件 / 在线 http(s) URL，含 `{rand}` 展开）与品牌图标（logo / favicon）           |
-| `htdocs/luci-static/shadcn/nav-topbar.css`    | 新增：顶栏布局样式（`nav=topbar` 时由 header.ut 引入，仅 ≥768px 生效）                                                            |
-| `htdocs/luci-static/shadcn/patches/admin-status.css` | 新增：状态页补丁样式（按页加载，文件名匹配 `admin/status` 前缀）；窄屏下修 Port status 卡片挤压（`minmax(140px, 1fr)` + 网格间距，手机 2 列 / 平板 4 列） |
-| `htdocs/luci-static/shadcn/patches/admin-network.css` | 新增：网络页补丁样式（匹配 `admin/network` 前缀）；两者共用一套卡片比例调整：图标 17.5 → 26.25px、收紧留白（body padding 3.5/7px、隐藏多余 `<br>`） |
+## 内容
 
-不受补丁影响的行为：未安装配置应用（无 `/etc/config/shadcn`）、**甚至这个脚本文件本身丢失**时，
-全部回落到主题内置默认值，与本主题打补丁前的表现完全一致。
+| 文件 | 作用 |
+| --- | --- |
+| `Makefile` | `PKG_RELEASE` 提到 `20261024.1`，让自编译的包高于上游发行版，避免被 feed 覆盖 |
+| `ucode/template/themes/shadcn/header.ut` | 读配置 → 注入主色 token、`theme-color`、昼夜策略、favicon、logo、`data-shadcn-nav` / `data-shadcn-icons` / `data-shadcn-density`，并按条件加载顶栏 / 图标 / 密度 / 响应式样式 |
+| `ucode/template/themes/shadcn/sysauth.ut` | 登录页壁纸与 logo 按配置替换 |
+| `root/usr/share/ucode/luci/shadcn_config.uc` | 读取并校验配置、生成 CSS 变量、解析壁纸与品牌图标；新增 `icons` / `density` 字段 |
+| `htdocs/luci-static/shadcn/nav-topbar.css` | 顶栏布局样式 |
+| `htdocs/luci-static/shadcn/density.css` | 页面密度（紧凑 / 默认 / 宽松） |
+| `htdocs/luci-static/shadcn/responsive.css` | 响应式兜底 + 底部按钮等高 + 卡片圆角对齐 |
+| `htdocs/luci-static/shadcn/icons.css` + `icons/redesign/` | 重绘图标集：29 条替换规则 + 29 个 SVG |
+| `htdocs/luci-static/shadcn/patches/*.css` | 按页补丁样式（状态页 / 网络页 / PassWall / 文件传输） |
 
-上游出新版后需要重新 `git apply`；有冲突时以 `files/` 里的内容手动合并即可。
+不受影响的行为：未安装配置应用（无 `/etc/config/shadcn`）、**甚至 `shadcn_config.uc` 丢失**时，
+全部回落到主题内置默认值，与打补丁前完全一致。
+
+上游出新版后，用 `files/` 覆盖即可（有冲突时以 `files/` 为准）。
 
 ## ⚠️ 五个不能改的设计（改回去主题会整个消失 / 退化）
 

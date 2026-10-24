@@ -35,7 +35,7 @@
 | 路径 | 内容 |
 | --- | --- |
 | `luci-app-shadcn-config/` | 设置应用（视图、rpcd、翻译） |
-| `luci-theme-shadcn-patch/` | 主题集成补丁（补丁文件、打好补丁的副本、安装脚本） |
+| `luci-theme-shadcn-patch/` | 主题集成：改好的文件副本 + 一键安装脚本 |
 | `ref/luci-theme-shadcn/` | 上游主题源码（构建基线，不进版本库） |
 | `dist/` | 构建产物（不进版本库） |
 | `tools/` | 打包与自检脚本 |
@@ -69,9 +69,9 @@ apk add --allow-untrusted luci-i18n-shadcn-config-zh-cn-*.apk   # 可选
 从 OpenWrt 源码树 / SDK 编译：
 
 ```sh
-# 1) 应用主题集成补丁（在主题源码目录内）
-cd package/luci-theme-shadcn          # 或 feeds/luci/themes/luci-theme-shadcn
-patch -p1 < /path/to/luci-theme-shadcn-patch/0001-luci-app-shadcn-config-integration.patch
+# 1) 把集成文件覆盖到主题源码（在 OpenWrt 源码树根目录执行）
+cp -r /path/to/luci-theme-shadcn-patch/files/. package/luci-theme-shadcn/
+#   实际路径可能是 feeds/luci/themes/luci-theme-shadcn
 
 # 2) 放入设置应用
 cp -r /path/to/luci-app-shadcn-config package/
@@ -85,7 +85,7 @@ make package/luci-app-shadcn-config/compile V=s
 ```
 
 产物在 `bin/packages/<arch>/base/`（opkg）或 `bin/packages/<arch>/apk/`（25.12+）。
-不想打补丁也可以直接用 `luci-theme-shadcn-patch/files/` 里已打好补丁的副本覆盖主题源码。
+已装原版主题、不想重新编译时：在路由器上跑 `sh install-theme-patch.sh` 即可把同样的文件写进去。
 
 ### 构建
 
