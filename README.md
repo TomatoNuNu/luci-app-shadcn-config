@@ -25,6 +25,14 @@ opkg install luci-app-shadcn-config_*.ipk        # 设置应用
 opkg install luci-i18n-shadcn-config-zh-cn_*.ipk # 中文（可选）
 ```
 
+**apk 固件（OpenWrt 25.12+）**：同上，换成 apk 包（未签名，需 `--allow-untrusted`）：
+
+```sh
+apk add --allow-untrusted luci-theme-shadcn-*.apk
+apk add --allow-untrusted luci-app-shadcn-config-*.apk
+apk add --allow-untrusted luci-i18n-shadcn-config-zh-cn-*.apk   # 可选
+```
+
 - **主题必须先装**。只装应用而主题未打补丁时，设置不生效。
 - 从源码编译主题：先应用 `luci-theme-shadcn-patch/0001-*.patch`，或在路由器上运行 `install-theme-patch.sh`。
 
@@ -45,10 +53,17 @@ opkg install luci-i18n-shadcn-config-zh-cn_*.ipk # 中文（可选）
 ## 构建
 
 ```sh
+# ipk（opkg 固件 23.05 ~ 24.10）
 python3 tools/build-ipk.py --app-dir luci-app-shadcn-config \
     --theme-dir ref/luci-theme-shadcn --out dist
 python3 tools/check-ipk.py dist/luci-theme-shadcn_*.ipk
+
+# apk（apk 固件 25.12+）：从已打好的 ipk 转打，需要 apk-tools v3
+sh tools/build-apk.sh dist
 ```
+
+`build-apk.sh` 默认调用系统 `apk`；如果本机没有 apk-tools v3，可自行编译后用
+`APK=/path/to/apk sh tools/build-apk.sh dist` 指定。
 
 ## License
 

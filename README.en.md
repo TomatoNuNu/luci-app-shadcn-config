@@ -25,6 +25,14 @@ opkg install luci-app-shadcn-config_*.ipk        # settings app
 opkg install luci-i18n-shadcn-config-zh-cn_*.ipk # Chinese translation (optional)
 ```
 
+**apk firmware (OpenWrt 25.12+)**: same order, using the apk packages (unsigned, so pass `--allow-untrusted`):
+
+```sh
+apk add --allow-untrusted luci-theme-shadcn-*.apk
+apk add --allow-untrusted luci-app-shadcn-config-*.apk
+apk add --allow-untrusted luci-i18n-shadcn-config-zh-cn-*.apk   # optional
+```
+
 - **Install the theme first.** Without the patched theme the settings have no effect.
 - Building the theme from source: apply `luci-theme-shadcn-patch/0001-*.patch` first, or run `install-theme-patch.sh` on the router.
 
@@ -45,10 +53,17 @@ Settings live in `/etc/config/shadcn` and are read by the theme while rendering.
 ## Build
 
 ```sh
+# ipk (opkg firmware, 23.05 - 24.10)
 python3 tools/build-ipk.py --app-dir luci-app-shadcn-config \
     --theme-dir ref/luci-theme-shadcn --out dist
 python3 tools/check-ipk.py dist/luci-theme-shadcn_*.ipk
+
+# apk (apk firmware, 25.12+): converts the ipk output, needs apk-tools v3
+sh tools/build-apk.sh dist
 ```
+
+`build-apk.sh` uses the `apk` command from `PATH`; if apk-tools v3 is not installed,
+build it and point the script at it: `APK=/path/to/apk sh tools/build-apk.sh dist`.
 
 ## License
 
