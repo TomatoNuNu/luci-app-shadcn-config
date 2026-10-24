@@ -65,6 +65,29 @@ sh tools/build-apk.sh dist
 `build-apk.sh` uses the `apk` command from `PATH`; if apk-tools v3 is not installed,
 build it and point the script at it: `APK=/path/to/apk sh tools/build-apk.sh dist`.
 
+### Building from the OpenWrt tree / SDK
+
+```sh
+# 1) apply the theme integration patch (inside the theme source)
+cd package/luci-theme-shadcn          # or feeds/luci/themes/luci-theme-shadcn
+patch -p1 < /path/to/luci-theme-shadcn-patch/0001-luci-app-shadcn-config-integration.patch
+
+# 2) drop in the settings app
+cp -r /path/to/luci-app-shadcn-config package/
+
+# 3) select and build
+make menuconfig
+#   LuCI -> Themes -> luci-theme-shadcn
+#   LuCI -> Applications -> luci-app-shadcn-config
+make package/luci-theme-shadcn/compile V=s
+make package/luci-app-shadcn-config/compile V=s
+```
+
+Output lands in `bin/packages/<arch>/base/` (opkg) or `bin/packages/<arch>/apk/` (25.12+).
+
+> Alternatively skip the patch and copy the pre-patched files from `luci-theme-shadcn-patch/files/`
+> over the theme source.
+
 ## License
 
 Apache-2.0

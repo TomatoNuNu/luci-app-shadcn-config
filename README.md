@@ -65,6 +65,28 @@ sh tools/build-apk.sh dist
 `build-apk.sh` 默认调用系统 `apk`；如果本机没有 apk-tools v3，可自行编译后用
 `APK=/path/to/apk sh tools/build-apk.sh dist` 指定。
 
+### 从 OpenWrt 源码树 / SDK 编译
+
+```sh
+# 1) 应用主题集成补丁（在主题源码目录内）
+cd package/luci-theme-shadcn          # 或 feeds/luci/themes/luci-theme-shadcn
+patch -p1 < /path/to/luci-theme-shadcn-patch/0001-luci-app-shadcn-config-integration.patch
+
+# 2) 放入设置应用
+cp -r /path/to/luci-app-shadcn-config package/
+
+# 3) 选中并编译
+make menuconfig
+#   LuCI → Themes → luci-theme-shadcn
+#   LuCI → Applications → luci-app-shadcn-config
+make package/luci-theme-shadcn/compile V=s
+make package/luci-app-shadcn-config/compile V=s
+```
+
+产物在 `bin/packages/<arch>/base/`（opkg）或 `bin/packages/<arch>/apk/`（25.12+）。
+
+> 不想打补丁也可以直接用 `luci-theme-shadcn-patch/files/` 里已打好补丁的副本覆盖主题源码。
+
 ## License
 
 Apache-2.0
