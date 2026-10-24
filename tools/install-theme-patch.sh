@@ -4,7 +4,7 @@
 # (install the shadcn-config integration patch onto an already installed theme)
 #
 # 与 luci-theme-shadcn-patch/0001-luci-app-shadcn-config-integration.patch 完全等价：
-# 路由器上没有 git/patch，所以这里直接替换那 38 个受影响的文件。
+# 路由器上没有 git/patch，所以这里直接替换那 37 个受影响的文件。
 #
 #   写入：
 #     /usr/share/ucode/luci/template/themes/shadcn/header.ut
@@ -241,8 +241,6 @@ cat > "$THEME_DIR/header.ut" <<'SHADCN_PATCH_PAYLOAD_EOF'
 		{# luci-app-shadcn-config: optional redrawn icon set -#}
 		<link rel="stylesheet" href="{{ media }}/icons.css" data-luci-shell>
 		{% endif %}
-		{# luci-app-shadcn-config: touch tap-to-toggle for the top bar -#}
-		<script defer src="{{ media }}/topbar-touch.js" data-luci-shell></script>
 		{# luci-app-shadcn-config: page density (compact / normal / large) -#}
 		<link rel="stylesheet" href="{{ media }}/density.css" data-luci-shell>
 		{% for (let patch in patch_files): %}
@@ -1192,33 +1190,6 @@ cat > "$THEME_MEDIA/nav-topbar.css" <<'SHADCN_PATCH_PAYLOAD_EOF'
 		padding: .5rem;
 	}
 }
-
-
-/* ────────────────────────────────────────────────────────────────────────
- * 顶栏下拉：触屏用 JS 维护的 data-tap-open 控制
- *
- * topbar-touch.js 在 (hover: none) 的设备上接管点击，写入 data-tap-open。
- * 这里让触屏忽略 :hover（否则点完手指抬起菜单就没了），改用该属性。
- * ──────────────────────────────────────────────────────────────────────── */
-@media (hover: none) {
-	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-item:hover > .sidebar-accordion-sub {
-		visibility: hidden;
-		opacity: 0;
-		pointer-events: none;
-	}
-
-	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-item[data-tap-open="true"] > .sidebar-accordion-sub {
-		visibility: visible;
-		opacity: 1;
-		pointer-events: auto;
-		transform: translateY(0);
-	}
-
-	html[data-shadcn-nav="topbar"] #sidebar .sidebar-accordion-item[data-tap-open="true"] > .sidebar-nav-parent {
-		background-color: var(--sidebar-accent);
-		color: var(--sidebar-accent-fg);
-	}
-}
 SHADCN_PATCH_PAYLOAD_EOF
 say "已写入  $THEME_MEDIA/nav-topbar.css"
 
@@ -1771,83 +1742,6 @@ html[data-shadcn-density] #sidebar { --sidebar-width: calc(16rem * var(--dens-bo
 SHADCN_PATCH_PAYLOAD_EOF
 say "已写入  $THEME_MEDIA/density.css"
 
-# ── 顶栏触屏点击切换脚本 ──
-#     -> $THEME_MEDIA/topbar-touch.js
-cat > "$THEME_MEDIA/topbar-touch.js" <<'SHADCN_PATCH_PAYLOAD_EOF'
-/*
- * topbar-touch.js — 顶栏下拉菜单的触屏点击切换
- *
- * 鼠标设备靠 CSS :hover 展开即可；触屏没有 hover，需要「点一下展开、再点收起、
- * 点别处关闭」的三态。纯 CSS 做不到（:focus-within 会让菜单关不掉，[data-open]
- * 又是主题用来标记「当前所在栏目」的属性，不能借用）。
- *
- * 这里用独立属性 data-tap-open 控制，并且只在 (hover: none) 的设备上接管。
- */
-(function () {
-	'use strict';
-
-	var mql = window.matchMedia('(hover: none)');
-	if (!mql.matches)
-		return;
-
-	function init() {
-		var sidebar = document.getElementById('sidebar');
-		if (!sidebar)
-			return;
-
-		var items = sidebar.querySelectorAll('.sidebar-accordion-item');
-		if (!items.length)
-			return;
-
-		function closeAll(except) {
-			items.forEach(function (item) {
-				if (item !== except)
-					item.removeAttribute('data-tap-open');
-			});
-		}
-
-		items.forEach(function (item) {
-			var trigger = item.querySelector('.sidebar-nav-parent');
-			if (!trigger || trigger.dataset.tapBound === '1')
-				return;
-			trigger.dataset.tapBound = '1';
-
-			trigger.addEventListener('click', function (ev) {
-				var open = item.getAttribute('data-tap-open') === 'true';
-
-				// 阻止默认的「聚焦后仍保留 hover 状态」行为
-				ev.preventDefault();
-				ev.stopPropagation();
-
-				if (open) {
-					item.removeAttribute('data-tap-open');
-				}
-				else {
-					closeAll(item);
-					item.setAttribute('data-tap-open', 'true');
-				}
-			});
-		});
-
-		// 点菜单外任意位置 → 全部收起
-		document.addEventListener('click', function (ev) {
-			if (ev.target.closest && ev.target.closest('.sidebar-accordion-item'))
-				return;
-			closeAll(null);
-		}, true);
-
-		// 切页时收起
-		window.addEventListener('hashchange', function () { closeAll(null); });
-	}
-
-	if (document.readyState === 'loading')
-		document.addEventListener('DOMContentLoaded', init);
-	else
-		init();
-})();
-SHADCN_PATCH_PAYLOAD_EOF
-say "已写入  $THEME_MEDIA/topbar-touch.js"
-
 # ── 响应式兜底（任意宽度不横向溢出） ──
 #     -> $THEME_MEDIA/responsive.css
 cat > "$THEME_MEDIA/responsive.css" <<'SHADCN_PATCH_PAYLOAD_EOF'
@@ -2202,7 +2096,7 @@ grep -q 'luci\.shadcn_config' "$THEME_DIR/sysauth.ut" \
 [ -s "$THEME_MEDIA/patches/admin-system-filetransfer.css" ] || die "写入后校验失败：patches/admin-system-filetransfer.css 为空"
 [ -s "$THEME_MEDIA/patches/admin.css" ] || die "写入后校验失败：patches/admin.css 为空"
 
-say "文件校验通过：38 个文件均已就位。"
+say "文件校验通过：37 个文件均已就位。"
 
 # ── 5. 编译自检（用系统自带的 ucode）────────────────────────────────────
 # 模板编译失败会让 LuCI 静默切换到别的主题（luci.runtime 的 trycompile），
