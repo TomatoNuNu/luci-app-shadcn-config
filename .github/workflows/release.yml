@@ -27,12 +27,35 @@ jobs:
           echo "LD_LIBRARY_PATH=/tmp/apk-tools/src" >> "$GITHUB_ENV"
           LD_LIBRARY_PATH=/tmp/apk-tools/src /tmp/apk-tools/src/apk --version
 
+      - name: Fetch upstream theme and apply the integration
+        run: |
+          git clone --depth 1 https://github.com/eamonxg/luci-theme-shadcn.git ref/luci-theme-shadcn
+          cp -r luci-theme-shadcn-patch/files/. ref/luci-theme-shadcn/
+          grep -m1 PKG_RELEASE ref/luci-theme-shadcn/Makefile
+
+      - name: Build po2lmo (for the translation package)
+        run: |
+          LUCI=https://raw.githubusercontent.com/openwrt/luci/openwrt-25.12/modules/luci-base/src
+          mkdir -p /tmp/po2lmo/lib
+          cd /tmp/po2lmo
+          curl -fsSL -o po2lmo.c "$LUCI/po2lmo.c"
+          curl -fsSL -o lib/lmo.c "$LUCI/lib/lmo.c"
+          curl -fsSL -o lib/lmo.h "$LUCI/lib/lmo.h"
+          curl -fsSL -o plural_formula.y "$LUCI/lib/plural_formula.y"
+          curl -fsSL -o lemon.c https://raw.githubusercontent.com/sqlite/sqlite/master/tool/lemon.c
+          curl -fsSL -o lempar.c https://raw.githubusercontent.com/sqlite/sqlite/master/tool/lempar.c
+          cc -O2 -o lemon lemon.c
+          ./lemon plural_formula.y
+          cc -O2 -o po2lmo po2lmo.c lib/lmo.c plural_formula.c -I. -Ilib
+          echo "PO2LMO=/tmp/po2lmo/po2lmo" >> "$GITHUB_ENV"
+
       - name: Build ipk packages
         run: |
           python3 tools/build-ipk.py \
             --app-dir luci-app-shadcn-config \
             --theme-dir ref/luci-theme-shadcn \
-            --out dist
+            --out dist \
+            --po2lmo "$PO2LMO"
 
       - name: Build apk packages
         env:
