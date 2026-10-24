@@ -35,7 +35,7 @@ BUILD_EPOCH = int(os.environ.get("SOURCE_DATE_EPOCH", "1781000000"))
 
 APP_NAME = "luci-app-shadcn-config"
 APP_VERSION = "1.0.9"
-APP_RELEASE = "20261013"
+APP_RELEASE = "20261024.1"
 APP_DESCRIPTION = (
     "Settings page for the shadcn LuCI theme: login wallpaper, HEX brand colour "
     "for light/dark mode and a day/night mode policy that can follow the system "

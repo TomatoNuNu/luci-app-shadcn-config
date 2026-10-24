@@ -17,7 +17,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-shadcn-config
 PKG_VERSION:=1.0.9
-PKG_RELEASE:=20261013
+PKG_RELEASE:=20261024.1
 
 PKG_MAINTAINER:=shadcn-config contributors
 PKG_LICENSE:=Apache-2.0
