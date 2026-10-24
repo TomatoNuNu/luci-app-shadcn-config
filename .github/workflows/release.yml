@@ -24,8 +24,8 @@ jobs:
           cd /tmp/apk-tools
           # genhelp 需要 lua5.3，Ubuntu 自带
           make -j"$(nproc)"
-          echo "APK_BIN=/tmp/apk-tools/src/apk" >> "$GITHUB_ENV"
-          /tmp/apk-tools/src/apk --version
+          echo "LD_LIBRARY_PATH=/tmp/apk-tools/src" >> "$GITHUB_ENV"
+          LD_LIBRARY_PATH=/tmp/apk-tools/src /tmp/apk-tools/src/apk --version
 
       - name: Build ipk packages
         run: |
@@ -37,6 +37,7 @@ jobs:
       - name: Build apk packages
         env:
           APK: /tmp/apk-tools/src/apk
+          LD_LIBRARY_PATH: /tmp/apk-tools/src
         run: sh tools/build-apk.sh dist
 
       - name: Show artifacts
